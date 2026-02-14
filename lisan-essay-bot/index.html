@@ -3,112 +3,910 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لسان الدعوة انشا جنریٹر</title>
+    <title>Al Lisan · Insha Generator</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- FileSaver for Word export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        body {
-            font-family: 'Noto Naskh Arabic', 'Arial', sans-serif;
-            background: #f5f5f5;
+        * {
             margin: 0;
-            padding: 20px;
-            direction: rtl;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            font-family: inherit;
+            padding: 0;
             box-sizing: border-box;
         }
-        button {
-            background: #27ae60;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0b0f1a;
+            color: #e0e4f0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Splash screen */
+        #splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0b0f1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 1s ease;
+            pointer-events: none;
+        }
+
+        .splash-logo {
+            text-align: center;
+            animation: fadeInScale 1.5s ease-out;
+        }
+
+        .splash-logo .logo-icon {
+            font-size: 6rem;
+            background: linear-gradient(145deg, #fbbf24, #b45309);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px #fbbf24);
+            margin-bottom: 1rem;
+        }
+
+        .splash-logo .logo-text {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fef3c7, #fde68a, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .splash-logo .logo-text span {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 4rem;
+            margin-right: 0.5rem;
+            background: linear-gradient(to right, #fef3c7, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Main content (initially hidden) */
+        #main-content {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        /* Canvas for WebGL background effect */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 30%, #1e2b4a, #0a0f1a);
+        }
+
+        .gradient-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(125deg, rgba(100,80,220,0.15) 0%, rgba(40,180,220,0.1) 50%, rgba(220,80,160,0.1) 100%);
+            filter: blur(80px);
+            z-index: -1;
+            animation: gradientShift 20s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+            100% { opacity: 0.5; transform: scale(1); }
+        }
+
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 4rem;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Logo icon (feather) – replace with your own image if desired */
+        .logo-icon {
+            font-size: 2.8rem;
+            background: linear-gradient(145deg, #fbbf24, #d97706);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px #fbbf24);
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #fef3c7, #fde68a, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text span {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 2.2rem;
+            margin-right: 0.3rem;
+            background: linear-gradient(to right, #fef3c7, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .tagline {
+            font-weight: 300;
+            color: #9aa4bf;
+            letter-spacing: 1px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            border-left: 2px solid #3f4e77;
+            padding-left: 1.5rem;
+        }
+
+        /* About pill button (top right) */
+        .about-pill {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #fde68a;
             cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+            white-space: nowrap;
+        }
+
+        .about-pill:hover {
+            background: rgba(245, 158, 11, 0.25);
+            border-color: #fbbf24;
+            box-shadow: 0 0 15px #fbbf24;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-gold {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706, #b45309);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shine 5s infinite;
+            font-size: 5rem;
+            display: inline-block;
+        }
+
+        @keyframes shine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero-sub {
+            font-size: 1.3rem;
+            color: #a6b0cc;
+            max-width: 700px;
+            margin: 0 auto 1rem;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: #b7c0d8;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Prominent disclaimer banner */
+        .disclaimer-banner {
+            background: rgba(245, 158, 11, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 60px;
+            padding: 1rem 2rem;
+            margin: 0 0 2.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            font-size: 1.2rem;
+            color: #fde68a;
+            box-shadow: 0 10px 25px -8px #b45309;
             width: 100%;
         }
-        button:hover {
-            background: #2ecc71;
+
+        .disclaimer-banner i {
+            font-size: 1.8rem;
+            color: #fbbf24;
         }
+
+        /* Input card with attention pulse */
+        .input-card {
+            background: rgba(20, 30, 50, 0.4);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 60px;
+            padding: 0.8rem 0.8rem 0.8rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 25px 45px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset;
+            transition: box-shadow 0.3s ease;
+            animation: pulseGlow 2s 3;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 25px 45px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset; }
+            50% { box-shadow: 0 30px 60px -10px #fbbf24, 0 0 0 2px #fbbf24 inset; }
+            100% { box-shadow: 0 25px 45px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset; }
+        }
+
+        .input-card:focus-within {
+            box-shadow: 0 30px 55px -10px #fbbf24, 0 0 0 2px #fbbf24 inset;
+            animation: none;
+        }
+
+        .input-card i {
+            color: #7f8fb2;
+            font-size: 1.5rem;
+        }
+
+        #topic {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: 'Noto Naskh Arabic', 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            color: white;
+            padding: 1rem 0;
+        }
+
+        #topic::placeholder {
+            color: #5f6f92;
+            font-weight: 300;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .generate-btn {
+            background: linear-gradient(145deg, #fbbf24, #d97706);
+            border: none;
+            border-radius: 50px;
+            padding: 1.2rem 2.8rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0b0f1a;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 25px -8px #b45309, 0 0 0 1px rgba(255,255,255,0.2) inset;
+            white-space: nowrap;
+        }
+
+        .generate-btn i {
+            font-size: 1.4rem;
+            transition: transform 0.3s;
+        }
+
+        .generate-btn:hover {
+            background: linear-gradient(145deg, #fcd34d, #f59e0b);
+            transform: scale(1.02);
+            box-shadow: 0 20px 35px -5px #d97706;
+        }
+
+        .generate-btn:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Result area */
+        .result-section {
+            margin-bottom: 2rem;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-header h2 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #cfd9f0;
+            letter-spacing: 0.5px;
+        }
+
+        .result-header i {
+            font-size: 1.8rem;
+            color: #fbbf24;
+            filter: drop-shadow(0 0 8px #fbbf24);
+        }
+
+        .essay-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 3rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 30px 50px -20px #00000080, 0 0 0 1px rgba(255,255,255,0.05) inset;
+            transition: all 0.3s;
+        }
+
+        .essay-card:hover {
+            border-color: rgba(251, 191, 36, 0.3);
+            box-shadow: 0 40px 70px -15px #b45309;
+        }
+
         #result {
-            margin-top: 20px;
-            padding: 20px;
-            background: #ecf0f1;
-            border-radius: 5px;
-            font-size: 18px;
-            line-height: 1.8;
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 1.5rem;
+            line-height: 2;
+            color: #ecf0fa;
             white-space: pre-wrap;
             word-wrap: break-word;
+            min-height: 300px;
+            max-height: 700px;
+            overflow-y: auto;
+            direction: rtl;
+            text-align: right;
+            padding-right: 0.5rem;
         }
-        .note {
-            font-size: 14px;
-            color: #555;
-            text-align: center;
-            margin-top: 10px;
+
+        #result::-webkit-scrollbar {
+            width: 8px;
         }
-        .ad {
-            margin: 20px 0;
+        #result::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        #result::-webkit-scrollbar-thumb {
+            background: #fbbf24;
+            border-radius: 10px;
+        }
+
+        .result-placeholder {
+            color: #7a89b0;
+            font-style: italic;
             text-align: center;
-            background: #ddd;
-            padding: 10px;
+            padding: 80px 20px;
+            font-family: 'Outfit', sans-serif;
+            direction: ltr;
+            font-size: 1.3rem;
+        }
+
+        /* Export buttons container */
+        .export-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .export-btn {
+            background: rgba(20, 30, 50, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #e0e4f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .export-btn i {
+            color: #fbbf24;
+            font-size: 1.2rem;
+        }
+
+        .export-btn:hover {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.15);
+            color: #fde68a;
+        }
+
+        /* Ad container */
+        .ad-container {
+            background: rgba(10, 15, 30, 0.4);
+            backdrop-filter: blur(8px);
+            border-radius: 60px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px dashed #3f4e77;
+            color: #8e9fc3;
+            margin: 2rem 0 2rem;
+            transition: all 0.3s;
+        }
+
+        .ad-container i {
+            font-size: 2.5rem;
+            color: #4b5e8c;
+            margin-bottom: 0.5rem;
+        }
+
+        .ad-container:hover {
+            border-color: #fbbf24;
+            color: #fde68a;
+        }
+
+        /* Footer */
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 2rem 0 1rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            color: #6f7da0;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .footer-links a {
+            color: #8e9fc3;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .footer-links a:hover {
+            color: #fbbf24;
+        }
+
+        .copyright {
+            font-size: 0.95rem;
+            color: #9ca3af;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1a1f30;
+            border-radius: 40px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 30px 60px -15px black;
+            color: #e0e4f0;
+            position: relative;
+        }
+
+        .modal-content h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fef3c7, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-content p {
+            margin-bottom: 2rem;
+            line-height: 1.8;
+            color: #b0bad4;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: #8e9fc3;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-btn {
+            background: #fbbf24;
+            border: none;
+            color: #0b0f1a;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .modal-btn:hover {
+            background: #fcd34d;
+        }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .main {
+                padding: 2rem;
+            }
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            .hero-gold {
+                font-size: 4rem;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .header-right {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .input-card {
+                flex-wrap: wrap;
+                background: transparent;
+                backdrop-filter: none;
+                border: none;
+                padding: 0;
+                gap: 1rem;
+            }
+            .generate-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            .hero-gold {
+                font-size: 3.2rem;
+            }
+            .essay-card {
+                padding: 2rem;
+            }
+            .disclaimer-banner {
+                font-size: 1rem;
+                padding: 0.8rem 1rem;
+            }
+            .export-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>🖋️ لسان الدعوة انشا جنریٹر</h1>
-        <p class="note">آپ موضوع اردو، عربی، یا انگریزی حروف میں لکھ سکتے ہیں۔ جواب ہمیشہ خالص لسان الدعوة رسم الخط میں ہوگا۔</p>
-        <input type="text" id="topic" placeholder="موضوع یہاں لکھیں (مثلاً: ilm ki fazilat)">
-        <button onclick="generateEssay()">انشا تیار کریں</button>
-        <div id="result">آپ کا انشا یہاں ظاہر ہوگا۔</div>
+    <!-- Splash Screen -->
+    <div id="splash">
+        <div class="splash-logo">
+            <i class="fas fa-feather-alt logo-icon"></i>
+            <div class="logo-text">
+                <span>لسان</span> · AL LISAN
+            </div>
+        </div>
+    </div>
 
-        <!-- AdSense will go here later -->
-        <div class="ad">
-            <!-- Google AdSense code will be placed here after approval -->
+    <!-- Main Content -->
+    <div id="main-content">
+        <div id="bg-canvas"></div>
+        <div class="gradient-overlay"></div>
+
+        <div class="main">
+            <!-- Header -->
+            <header>
+                <div class="logo-area">
+                    <!-- Replace this <i> with your own logo if desired -->
+                    <i class="fas fa-feather-alt logo-icon"></i>
+                    <div class="logo-text">
+                        <span>لسان</span> · AL LISAN
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="tagline">Insha Generator · Pure Lisan‑ud‑Dawat</div>
+                    <!-- Top-right About button -->
+                    <div class="about-pill" onclick="showModal('underConstruction')">
+                        <i class="fas fa-info-circle" style="margin-right: 6px;"></i> About
+                    </div>
+                </div>
+            </header>
+
+            <!-- Hero -->
+            <div class="hero">
+                <h1>
+                    <span class="hero-gold">Insha Generator</span><br>
+                    <span class="hero-sub">AI‑Powered Essays</span>
+                </h1>
+                <div class="hero-desc">
+                    Authentic Lisan‑ud‑Dawat, structured Muqaddama → Bayan → Natijah, generated instantly.
+                </div>
+            </div>
+
+            <!-- Prominent Disclaimer Banner -->
+            <div class="disclaimer-banner">
+                <i class="fas fa-language"></i>
+                <span><strong>Type your topic in any script (Urdu, Arabic, English/Roman).</strong> The essay will always be generated in pure Lisan‑ud‑Dawat script.</span>
+            </div>
+
+            <!-- Input area with autofocus and highlight animation -->
+            <div class="input-card">
+                <i class="fas fa-pen"></i>
+                <input type="text" id="topic" placeholder="e.g., ilm ki fazilat, والدین کی خدمت, رمضان کے برکات" dir="auto" autofocus>
+                <button class="generate-btn" id="generateBtn" onclick="generateEssay()">
+                    <span>Generate Essay</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Result section -->
+            <div class="result-section">
+                <div class="result-header">
+                    <i class="fas fa-scroll"></i>
+                    <h2>Your Essay</h2>
+                </div>
+                <div class="essay-card">
+                    <div id="result">
+                        <div class="result-placeholder">
+                            <i class="fas fa-pencil-alt" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.6;"></i>
+                            <p>Enter a topic above and generate a masterpiece.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Export buttons (hidden initially) -->
+                <div class="export-buttons" id="exportButtons" style="display: none;">
+                    <button class="export-btn" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export as PDF</button>
+                    <button class="export-btn" onclick="exportWord()"><i class="fas fa-file-word"></i> Export as Word</button>
+                </div>
+            </div>
+
+            <!-- AdSense placeholder -->
+            <div class="ad-container" id="adPlaceholder">
+                <i class="fas fa-ad"></i>
+                <p>Advertisement · Google AdSense will appear here after approval.</p>
+            </div>
+
+            <!-- Footer -->
+            <footer>
+                <div class="copyright">
+                    © 2026 Al Lisan · Insha Generator
+                </div>
+                <div class="footer-links">
+                    <a onclick="showModal('about')"><i class="fas fa-info-circle"></i> About</a>
+                    <a onclick="showModal('privacy')"><i class="fas fa-shield-alt"></i> Privacy</a>
+                    <a href="mailto:insha.bot.ai@gmail.com"><i class="fas fa-envelope"></i> Contact</a>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content" id="modal-content">
+            <button class="modal-close" onclick="closeModal(event)"><i class="fas fa-times"></i></button>
+            <div id="modal-body"></div>
         </div>
     </div>
 
     <script>
+        // Splash screen: fade out after 2 seconds
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('splash').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('splash').style.display = 'none';
+                    document.getElementById('main-content').style.opacity = '1';
+                }, 1000);
+            }, 2000);
+        });
+
+        // Modal functionality
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalBody = document.getElementById('modal-body');
+
+        function showModal(type) {
+            let title, content;
+            if (type === 'about') {
+                title = 'About Al Lisan';
+                content = `<p>Al Lisan is an AI‑powered tool that generates high‑quality essays in pure Lisan‑ud‑Dawat, the language of the Dawoodi Bohra community. It follows the classical structure: <strong>Muqaddama</strong> (introduction), <strong>Bayan</strong> (detailed discussion), and <strong>Natijah</strong> (conclusion).</p>
+                          <p><strong>Features:</strong></p>
+                          <ul style="margin-left: 1.5rem; color: #b0bad4;">
+                              <li>Accepts topics in any script (English, Urdu, Arabic, Roman)</li>
+                              <li>Always outputs in authentic Lisan‑ud‑Dawat script</li>
+                              <li>Powered by advanced AI, fine‑tuned with real sermon examples</li>
+                              <li>Free for the community, with no login required</li>
+                          </ul>`;
+            } else if (type === 'privacy') {
+                title = 'Your Privacy is Safe';
+                content = `<p>We do not collect, store, or share any personal information. The topics you enter are used only to generate your essay and are not saved. Your data remains yours.</p>
+                          <p>We use Google AdSense for ads, which may use cookies, but we have no access to that data. For more details, please refer to Google's privacy policy.</p>`;
+            } else if (type === 'underConstruction') {
+                title = 'Al Lisan · Under Construction';
+                content = `<p>This project is in active development. We are continuously improving the AI to deliver even more authentic and refined essays in Lisan‑ud‑Dawat.</p>
+                          <p>Stay tuned – many exciting updates are on the way! Your feedback is always welcome.</p>
+                          <p><i class="fas fa-heart" style="color: #fbbf24;"></i> Thank you for being part of this journey.</p>`;
+            }
+            modalBody.innerHTML = `<h3>${title}</h3>${content}`;
+            modalOverlay.style.display = 'flex';
+        }
+
+        function closeModal(event) {
+            if (event.target === modalOverlay || event.target.closest('.modal-close')) {
+                modalOverlay.style.display = 'none';
+            }
+        }
+
+        // Global variable to store the latest essay text
+        let currentEssay = '';
+
+        // Essay generation function
         async function generateEssay() {
-            const topic = document.getElementById('topic').value;
+            const topicInput = document.getElementById('topic');
+            const topic = topicInput.value.trim();
+            const resultDiv = document.getElementById('result');
+            const generateBtn = document.getElementById('generateBtn');
+            const btnText = generateBtn.querySelector('span');
+            const btnIcon = generateBtn.querySelector('.fa-arrow-right');
+            const exportButtons = document.getElementById('exportButtons');
+
             if (!topic) {
-                alert('براہ کرم موضوع لکھیں');
+                alert('Please enter a topic');
                 return;
             }
-            document.getElementById('result').innerText = 'انشا تیار ہو رہا ہے... براہ کرم انتظار کریں۔';
+
+            // Loading state
+            const originalBtnText = btnText.innerText;
+            btnText.innerText = 'Generating';
+            btnIcon.style.display = 'none';
+            const spinner = document.createElement('span');
+            spinner.className = 'spinner';
+            spinner.style.cssText = 'display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:white; animation:spin 0.8s linear infinite; margin-left:10px;';
+            generateBtn.appendChild(spinner);
+            generateBtn.disabled = true;
+
+            // Add keyframes for spinner if not present
+            if (!document.getElementById('spinner-keyframes')) {
+                const style = document.createElement('style');
+                style.id = 'spinner-keyframes';
+                style.innerHTML = '@keyframes spin { to { transform: rotate(360deg); } }';
+                document.head.appendChild(style);
+            }
+
+            // Show loading in result
+            resultDiv.innerHTML = `
+                <div style="text-align: center; padding: 80px 20px;">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size: 4rem; color: #fbbf24; margin-bottom: 20px;"></i>
+                    <p style="color: #a6b0cc; font-size: 1.3rem;">Crafting your essay in Lisan‑ud‑Dawat...</p>
+                </div>
+            `;
+            // Hide export buttons while loading
+            exportButtons.style.display = 'none';
+
             try {
                 const response = await fetch('/api/gemini', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ topic })
                 });
+
                 const data = await response.json();
+
                 if (data.essay) {
-                    document.getElementById('result').innerText = data.essay;
+                    currentEssay = data.essay;
+                    resultDiv.innerHTML = `<div style="direction: rtl; text-align: right;">${data.essay.replace(/\n/g, '<br>')}</div>`;
+                    exportButtons.style.display = 'flex'; // Show export buttons
                 } else {
-                    document.getElementById('result').innerText = 'کچھ خرابی ہوئی، دوبارہ کوشش کریں۔';
+                    currentEssay = '';
+                    resultDiv.innerHTML = `
+                        <div class="result-placeholder">
+                            <i class="fas fa-exclamation-triangle" style="color: #e55; font-size: 2.5rem; margin-bottom: 15px;"></i>
+                            <p>Error: ${data.error || 'Something went wrong'}</p>
+                        </div>
+                    `;
                 }
             } catch (error) {
-                document.getElementById('result').innerText = 'نیٹ ورک کی خرابی۔';
+                currentEssay = '';
+                resultDiv.innerHTML = `
+                    <div class="result-placeholder">
+                        <i class="fas fa-wifi-slash" style="color: #e55; font-size: 2.5rem; margin-bottom: 15px;"></i>
+                        <p>Network error. Please try again.</p>
+                    </div>
+                `;
+            } finally {
+                btnText.innerText = originalBtnText;
+                btnIcon.style.display = 'inline-block';
+                if (spinner) spinner.remove();
+                generateBtn.disabled = false;
             }
+        }
+
+        // Export as PDF
+        function exportPDF() {
+            if (!currentEssay) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const splitText = doc.splitTextToSize(currentEssay, 180);
+            doc.setFont('Noto Naskh Arabic', 'normal');
+            doc.text(splitText, 15, 20);
+            doc.save('Al_Lisan_Essay.pdf');
+        }
+
+        // Export as Word (.docx)
+        function exportWord() {
+            if (!currentEssay) return;
+            const blob = new Blob([currentEssay], { type: 'application/msword' });
+            saveAs(blob, 'Al_Lisan_Essay.doc');
         }
     </script>
 </body>
