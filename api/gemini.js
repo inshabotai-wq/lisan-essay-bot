@@ -165,7 +165,8 @@ ${examples}
     `;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        // FIXED: Using gemini-2.5-flash which is confirmed working
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -176,6 +177,9 @@ ${examples}
         });
 
         const data = await response.json();
+        
+        // Log for debugging (remove later)
+        console.log('API Response:', JSON.stringify(data, null, 2));
 
         const essay = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
