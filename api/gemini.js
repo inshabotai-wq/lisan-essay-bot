@@ -3,34 +3,18 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { topic } = req.body;
+    const { topic, type } = req.body;
     if (!topic) {
         return res.status(400).json({ error: 'Topic is required' });
     }
 
     const GEMINI_API_KEY = process.env.GEMINI_KEY;
 
-    // Use XML-style tags for clear structure - this helps the AI understand exactly what to do [citation:4]
-    const systemPrompt = `
-<role>
-You are an expert essay writer in Lisan-ud-Dawat, the language of the Dawoodi Bohra community. You have studied hundreds of authentic sermons and mastered the classical structure. 
-You know that lisa ud dawat has their diffrent alphabeta which are not in arabic, so you have understood it and leearn the launguage as it is.
-</role>
-
-<task>
-Write a NEW, ORIGINAL essay on the topic provided by the user. The essay must:
-1. Be in pure Lisan-ud-Dawat script (Arabic-based)
-2. Follow the classical structure: Muqaddama (introduction) → Bayan (body) → Natijah (conclusion)
-3. NOT include headings like "Muqaddama:"—just write flowing text
-4. Be completely original—do NOT copy the example texts verbatim
-5. Match the tone, vocabulary, and style of the examples below
-</task>
-
-<examples>
-Below are authentic Lisan-ud-Dawat passages showing the correct style. Study their vocabulary, sentence structure, and flow—but write something NEW for the user's topic.
-
-مثال ۱:
-[اسس دانشمندو! اثثن سككلا هجري سنة ححوّدسو سُـرٌتاليس (1447) نا اْغاز ما ححهسس، دعوة يمن سي هندوستان ني طرف نقل تهئي اهنسس ثثانسو ورس تهيا ححهسس، 
+    // ========== PASTE YOUR SERMON EXCERPTS BELOW ==========
+    // Choose 3-5 short passages (2-4 sentences each) from your sermons.
+    // These will teach the AI the authentic Lisan-ud-Dawat style.
+    // Do NOT include any headings or labels – just the text.
+    const sermonExamples = `[اسس دانشمندو! اثثن سككلا هجري سنة ححوّدسو سُـرٌتاليس (1447) نا اْغاز ما ححهسس، دعوة يمن سي هندوستان ني طرف نقل تهئي اهنسس ثثانسو ورس تهيا ححهسس، 
 هندوستان ما ثثهلسس ما ثثهلسس داعي نا وجود ني سعادة كئي زمين نسس ملسس ححهسس كه سيدهثثور نسس، كونا سبب يه سعادة ملسس ححهسس، كه نجم نا سبب - تارا نا سبب، يه تارا نا واسطسس اْخر دعاة اليمن تيويسما داعي سيدنا محمد عز الدين يه ايم فرمايو ححهسس كه "ان يوسف في اي مكان كان يكون هناك امن وامان، لا يمسه سوء الشيطان ولا الفتان "، يوسف جه بهي جككه هسسس وهاطط امن وامان قائم رهسسس، وهاطط فتنة كرنار شيطان كوئي فتنة نظظيطط كري سكسس، 
 تو اْ نجم كون ححهسس كه ححوويسما داعي سيدنا  يوسف نجم الدين جه نو وطن سيدهثثور ححهسس، يهاطط مدراس ما - ححنّائي ما سيدهثثور نا ككهنا لوككو ححهسس، يهاطط بيسرا شهرو نا بهي ححهسس مككر زياده  تر سيدهثثور نا ححهسس، بيسرا شهرو نا بهي ححهسس  - يه سككلا ني طرف بهي انسس تمام مؤمنين مؤمنات ني طرف سيدنا يوسف نجم الدين ني بركات ثثظظنححي ححهسس انسس ثثظظنححي رهي ححهسس، 
 يھ سيدنا يوسف يه سيدهثثور ما فتنة نا زمان ما مؤمنين نو محلّھ اْباد كيدو انسس اهما ححوويس دُكان بناوي، انسس جه مثل تاراؤ سي اْسمان نا لوككو نسس امان ملسس ححهسس يه} مثل سيدنا يوسف نجم الدين سي مؤمنين نسس امان ملي ككيو، 
@@ -73,9 +57,7 @@ Below are authentic Lisan-ud-Dawat passages showing the correct style. Study the
 ***
 مؤمنين ني جماعة! فلك محيط ني ايك عظيم خاصية سوطط ححهسس؟ كه يه شفاف ححهسس، transparent ححهسس، هوسس جه فلك محيط سي زيادة قريب ححهسس، اهما لطافة زيادة ححهسس انسس اهنو opposite زمين نو جه centre ححهسس يه سخت ما سخت ححهسس، ككهنو كثيف ححهسس اهما لطافة ححهسس} نظظيطط، تو زمين سي جه ححيزو جتني زيادة قريب ححهسس اتني اهما كثافة زيادة ححهسس، 
 اسس برادرو! خدا نا ولي جه فلك محيط ني مثل ححهسس يه بهي يه} مثل صاف ححهسس، اهما كوئي كثافة نتهي انسس جه شخص اهنا سي جتنا زيادة قريب تهائي ححهسس اهما بهي يه مثل صفاء اْوي جائي ححهسس، انسس يه صفاء انسس اخلاص نا سبب شتابي درجات ما ححرٌهي نسس اعلى رتبة لكك ثثظظنححي جائي ححهسس، انسس ولي الله سي جه جتنا دور ححهسس اهما كثافة زيادة ححهسس، اْ نزديكي انسس اْ دوري جان ني نزديكي انسس دوري ححهسس، كوئي جسم سي ككهنا قريب بهي هوئي مككر جان سي قريب نظظيطط هوئي تو يه كئي قريب نھ كظظوائي.
-***]
-
-مثال ۲:
+***s]
 [1447 - المجلس الثاني
 اسس برادرو! تاراؤ ني تأثير نو علم ححهسس مككر ايم نھ بنسس كه كوئي يه علم جاني نسس تاراؤ نوايمان لاوسس، انسس ايم كهي دسس كه جه ححهسس تھ تاراؤ ححهسس، تاراؤ} سككلي ححيزو كرسس ححهسس، انسس اْ وات بھولي جائي كه اهنا ثثيدا نا كرنار خدا ححهسس، كه جه ني مشيئة سي سككلو تهائي ححهسس، اْ مثل كوئي اعتقاد راكهسس تو يه كفر ني وات ححهسس، اْسمان نا بروج انسس تاراؤ تمام عالَم ثثر تأثير ناكهسس ححهسس جه نا سبب تمام عالَم ني نشؤونما تهائي ححهسس، مككر خود يه بروج ثثر تأثير كون ناكهسس ححهسس كه روحاني تاراؤ جه اولياء الله ححهسس.
 ***
@@ -125,8 +107,6 @@ Below are authentic Lisan-ud-Dawat passages showing the correct style. Study the
 اسرار ني حفاظة كروا ني خوبي، امانة داري ني خوبي نسس اولياء الله ككهني مھوضضي خوبي ككردانسس ححهسس، 
 تو اسس عزادارو! ايمان نا ككهر ما confidentiality ني بلندي هووي جوئيسس، سححو بولوا ثثر انسس سِر نسس ححھثثاوا ثثر فرزندو ني تربية تهاوي جوئيسس.
 *** ]
-
-مثال ۳:
 [1447 - المجلس الثالث
 زُحَل نسس English ما Saturn كظظوائي ححهسس، فارسي زبان ما اهنو نام كَيوان ححهسس، ايم كظظوائي ححهسس كه سورج انسس مُشتري يعني Sun and Jupiter نا بعد مهوضضا ما مهوضضا كوكب زُحَل ححهسس... 
 تاراؤ نا علم ما جه ماهر هوئي ححهسس اهنا نزديك زُحَل - taskmaster سي اولكهائي ححهسس، وقت انسس تجارب سي سيكهتا رهوو، تمام ذمھ داريو نسس لئي اُضضھوو انسس discipline راكهوو يه زُحَل سي سيكهوا ملسس ححهسس، 
@@ -169,23 +149,46 @@ Discipline سوطط ححهسس - تهذيب، اُردو ما نظم وضبط ك
 صحيح discipline يه ححهسس كه مؤمن ني قدر جتني بهي بلند تهائي مككر يه خدا انسس خدا نا ولي امام الزمان انسس ستر نا زمان ما اهنا دعاة مطلقين نسس بھولي نھ جائي، انسس هميشھ اهنا واسطسس تواضع كرسس، كه جه ني دعاء ني بركة سي انسس اهني نظرات سي اهنسس كاميابي انسس بلندي ملي ححهسس، 
 اسس عزيزو! جه مُنعِم هوئي اهني هميشھ قدر كرتا رهوو جوئيسس، ايم تو نھ} بنسس كه اهني قدر نھ كروا نا بدل كوئي اهنا ثثر} تعدّي كري دسس. 
 *** ]
-</examples>
+[Optional: fourth excerpt]
+[Optional: fifth excerpt]`;
+    // =======================================================
 
-<thinking>
-Before writing, consider:
-1. What would be a proper Muqaddama (introduction) for this topic?
-2. What key points belong in the Bayan (body)?
-3. How should the Natijah (conclusion) summarize and conclude?
-</thinking>
+    const systemPrompt = `
+# IDENTITY
+You are a master writer in Lisan-ud-Dawat, the language of the Dawoodi Bohra community. You have internalised the style, vocabulary, 
+and rhythm of hundreds of authentic sermons. All the exampales are style guides to learn fromand are not context to copy from. 
+You know that lisa ud dawat has their diffrent alphabeta which are not in arabic,
+ so you have understood it and leearn the launguage as it is.
 
-<user_topic>
-${topic}
-</user_topic>
+# TASK
+Write a **completely original** essay in pure Lisan-ud-Dawat on the topic: "${topic}".
+The essay must follow the **${type || 'General'}** style (if "Other", use a balanced style).
 
-Now write the complete essay in Lisan-ud-Dawat:`;
+# STRUCTURE (do NOT use headings)
+1. **Muqaddama (مقدمہ)** – a graceful introduction that sets the context.
+2. **Bayan (بیان)** – the main body, developing ideas logically. Include **at least one Quranic verse** (with reference, e.g., "سورۃ البقرۃ آیت ۲۸۶") and **one authentic Hadith** (e.g., "قال رسول الله ﷺ") that support the topic.
+3. **Natijah (نتیجہ)** – a thoughtful conclusion that summarises and ends with a prayer or moral.
+
+# STYLE REFERENCE
+Below are excerpts from authentic Lisan-ud-Dawat sermons. Study their tone, sentence flow, and word choices – but **create entirely new sentences**. Do not copy any phrase from these examples.
+
+--- BEGIN EXAMPLES ---
+${sermonExamples}
+--- END EXAMPLES ---
+
+# CRITICAL RULES
+- **Never copy any example text** – every sentence must be original.
+- **Never include headings** like "مقدمہ:" – just write flowing text.
+- **Do not mention any Sahabah, Khalifas, or contemporary figures by name** – only Allah and the Prophet ﷺ may be referenced.
+- **Do not fabricate Quranic verses or Hadith** – use only authentic ones you know.
+- **Maximum length: 1000 words**. Be concise but rich.
+- **Output only the essay** – no commentary, no notes, no translations.
+
+# FORMAT
+Return only the essay text in Lisan-ud-Dawat script. The user may have typed the topic in Roman letters – ignore that and write only in Lisan-ud-Dawat.
+`;
 
     try {
-        // Using the confirmed working model [citation:5]
         const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -194,25 +197,29 @@ Now write the complete essay in Lisan-ud-Dawat:`;
                     parts: [{ text: systemPrompt }]
                 }],
                 generationConfig: {
-                    temperature: 0.9,  // Higher temperature for creativity [citation:2]
-                    maxOutputTokens: 1500,  // Allow longer essays
-                    topP: 0.95
+                    temperature: 1.0,          // Encourages creativity
+                    maxOutputTokens: 2000,      // Approx 1000 words
+                    topP: 0.95,
+                    topK: 40
                 }
             })
         });
 
         const data = await response.json();
-        
+
+        // Check for errors
+        if (!response.ok) {
+            console.error('Gemini API error:', data);
+            return res.status(response.status).json({ error: data.error?.message || 'Gemini API error' });
+        }
+
         const essay = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (essay) {
             res.status(200).json({ essay });
         } else {
-            console.error('Gemini error:', data);
-            res.status(500).json({ 
-                error: 'Failed to generate essay', 
-                details: data.error || 'Unknown error'
-            });
+            console.error('No essay in response:', data);
+            res.status(500).json({ error: 'Failed to generate essay', details: data });
         }
     } catch (error) {
         console.error('API call failed:', error);
