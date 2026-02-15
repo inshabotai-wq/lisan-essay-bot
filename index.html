@@ -4,7 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Al Lisan · Insha Generator</title>
-    <!-- Fonts -->
+    <!-- Custom Font -->
+    <style>
+        @font-face {
+            font-family: 'LisanFont';
+            src: url('lisan_font.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+    </style>
+    <!-- Google Fonts (fallback) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -50,13 +60,11 @@
             animation: fadeInScale 1.5s ease-out;
         }
 
-        .splash-logo .logo-icon {
-            font-size: 6rem;
-            background: linear-gradient(145deg, #fbbf24, #b45309);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 30px #fbbf24);
+        .splash-logo img {
+            height: 120px; /* scaled down from 1536x1024 */
+            width: auto;
             margin-bottom: 1rem;
+            filter: drop-shadow(0 0 30px #fbbf24);
         }
 
         .splash-logo .logo-text {
@@ -88,7 +96,7 @@
             transition: opacity 1s ease;
         }
 
-        /* Canvas for WebGL background effect */
+        /* Background */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -144,13 +152,10 @@
             gap: 1rem;
         }
 
-        /* Logo icon (feather) – replace with your own image if desired */
-        .logo-icon {
-            font-size: 2.8rem;
-            background: linear-gradient(145deg, #fbbf24, #d97706);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px #fbbf24);
+        .logo-area img {
+            height: 50px; /* scaled down */
+            width: auto;
+            filter: drop-shadow(0 0 10px #fbbf24);
         }
 
         .logo-text {
@@ -187,7 +192,7 @@
             padding-left: 1.5rem;
         }
 
-        /* About pill button (top right) */
+        /* About pill button */
         .about-pill {
             background: rgba(245, 158, 11, 0.1);
             border: 1px solid rgba(245, 158, 11, 0.3);
@@ -251,7 +256,7 @@
             margin-bottom: 1.5rem;
         }
 
-        /* Prominent disclaimer banner */
+        /* Disclaimer banner */
         .disclaimer-banner {
             background: rgba(245, 158, 11, 0.15);
             backdrop-filter: blur(10px);
@@ -274,7 +279,7 @@
             color: #fbbf24;
         }
 
-        /* Input card with attention pulse */
+        /* Input card */
         .input-card {
             background: rgba(20, 30, 50, 0.4);
             backdrop-filter: blur(16px);
@@ -311,7 +316,7 @@
             background: transparent;
             border: none;
             outline: none;
-            font-family: 'Noto Naskh Arabic', 'Outfit', sans-serif;
+            font-family: 'LisanFont', 'Noto Naskh Arabic', 'Outfit', sans-serif;
             font-size: 1.3rem;
             color: white;
             padding: 1rem 0;
@@ -396,7 +401,7 @@
         }
 
         #result {
-            font-family: 'Noto Naskh Arabic', serif;
+            font-family: 'LisanFont', 'Noto Naskh Arabic', serif;
             font-size: 1.5rem;
             line-height: 2;
             color: #ecf0fa;
@@ -432,7 +437,7 @@
             font-size: 1.3rem;
         }
 
-        /* Export buttons container */
+        /* Export buttons */
         .export-buttons {
             display: flex;
             justify-content: flex-end;
@@ -566,6 +571,11 @@
             color: #b0bad4;
         }
 
+        .modal-content ul {
+            color: #b0bad4;
+            margin-left: 1.5rem;
+        }
+
         .modal-close {
             position: absolute;
             top: 1.5rem;
@@ -652,7 +662,7 @@
     <!-- Splash Screen -->
     <div id="splash">
         <div class="splash-logo">
-            <i class="fas fa-feather-alt logo-icon"></i>
+            <img src="lisan_logo.png" alt="Al Lisan Logo">
             <div class="logo-text">
                 <span>لسان</span> · AL LISAN
             </div>
@@ -668,15 +678,13 @@
             <!-- Header -->
             <header>
                 <div class="logo-area">
-                    <!-- Replace this <i> with your own logo if desired -->
-                    <i class="fas fa-feather-alt logo-icon"></i>
+                    <img src="lisan_logo.png" alt="Al Lisan Logo">
                     <div class="logo-text">
                         <span>لسان</span> · AL LISAN
                     </div>
                 </div>
                 <div class="header-right">
                     <div class="tagline">Insha Generator · Pure Lisan‑ud‑Dawat</div>
-                    <!-- Top-right About button -->
                     <div class="about-pill" onclick="showModal('underConstruction')">
                         <i class="fas fa-info-circle" style="margin-right: 6px;"></i> About
                     </div>
@@ -694,13 +702,13 @@
                 </div>
             </div>
 
-            <!-- Prominent Disclaimer Banner -->
+            <!-- Disclaimer Banner -->
             <div class="disclaimer-banner">
                 <i class="fas fa-language"></i>
                 <span><strong>Type your topic in any script (Urdu, Arabic, English/Roman).</strong> The essay will always be generated in pure Lisan‑ud‑Dawat script.</span>
             </div>
 
-            <!-- Input area with autofocus and highlight animation -->
+            <!-- Input area -->
             <div class="input-card">
                 <i class="fas fa-pen"></i>
                 <input type="text" id="topic" placeholder="e.g., ilm ki fazilat, والدین کی خدمت, رمضان کے برکات" dir="auto" autofocus>
@@ -760,7 +768,7 @@
     </div>
 
     <script>
-        // Splash screen: fade out after 2 seconds
+        // Splash screen fade out after 2 seconds
         window.addEventListener('load', function() {
             setTimeout(function() {
                 document.getElementById('splash').style.opacity = '0';
@@ -771,7 +779,7 @@
             }, 2000);
         });
 
-        // Modal functionality
+        // Modal functions
         const modalOverlay = document.getElementById('modal-overlay');
         const modalBody = document.getElementById('modal-body');
 
@@ -781,7 +789,7 @@
                 title = 'About Al Lisan';
                 content = `<p>Al Lisan is an AI‑powered tool that generates high‑quality essays in pure Lisan‑ud‑Dawat, the language of the Dawoodi Bohra community. It follows the classical structure: <strong>Muqaddama</strong> (introduction), <strong>Bayan</strong> (detailed discussion), and <strong>Natijah</strong> (conclusion).</p>
                           <p><strong>Features:</strong></p>
-                          <ul style="margin-left: 1.5rem; color: #b0bad4;">
+                          <ul>
                               <li>Accepts topics in any script (English, Urdu, Arabic, Roman)</li>
                               <li>Always outputs in authentic Lisan‑ud‑Dawat script</li>
                               <li>Powered by advanced AI, fine‑tuned with real sermon examples</li>
@@ -807,7 +815,7 @@
             }
         }
 
-        // Global variable to store the latest essay text
+        // Global variable for current essay
         let currentEssay = '';
 
         // Essay generation function
@@ -850,7 +858,6 @@
                     <p style="color: #a6b0cc; font-size: 1.3rem;">Crafting your essay in Lisan‑ud‑Dawat...</p>
                 </div>
             `;
-            // Hide export buttons while loading
             exportButtons.style.display = 'none';
 
             try {
@@ -865,7 +872,7 @@
                 if (data.essay) {
                     currentEssay = data.essay;
                     resultDiv.innerHTML = `<div style="direction: rtl; text-align: right;">${data.essay.replace(/\n/g, '<br>')}</div>`;
-                    exportButtons.style.display = 'flex'; // Show export buttons
+                    exportButtons.style.display = 'flex';
                 } else {
                     currentEssay = '';
                     resultDiv.innerHTML = `
@@ -897,12 +904,12 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const splitText = doc.splitTextToSize(currentEssay, 180);
-            doc.setFont('Noto Naskh Arabic', 'normal');
+            doc.setFont('LisanFont', 'normal'); // Note: jsPDF may not support custom fonts easily; fallback to standard
             doc.text(splitText, 15, 20);
             doc.save('Al_Lisan_Essay.pdf');
         }
 
-        // Export as Word (.docx)
+        // Export as Word
         function exportWord() {
             if (!currentEssay) return;
             const blob = new Blob([currentEssay], { type: 'application/msword' });
