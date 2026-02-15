@@ -10,9 +10,26 @@ export default async function handler(req, res) {
 
     const GEMINI_API_KEY = process.env.GEMINI_KEY;
 
-    // === PASTE YOUR SERMON EXAMPLES HERE (in Unicode) ===
-    const examples = `
-مثال 1:
+    // Use XML-style tags for clear structure - this helps the AI understand exactly what to do [citation:4]
+    const systemPrompt = `
+<role>
+You are an expert essay writer in Lisan-ud-Dawat, the language of the Dawoodi Bohra community. You have studied hundreds of authentic sermons and mastered the classical structure. 
+You know that lisa ud dawat has their diffrent alphabeta which are not in arabic, so you have understood it and leearn the launguage as it is.
+</role>
+
+<task>
+Write a NEW, ORIGINAL essay on the topic provided by the user. The essay must:
+1. Be in pure Lisan-ud-Dawat script (Arabic-based)
+2. Follow the classical structure: Muqaddama (introduction) → Bayan (body) → Natijah (conclusion)
+3. NOT include headings like "Muqaddama:"—just write flowing text
+4. Be completely original—do NOT copy the example texts verbatim
+5. Match the tone, vocabulary, and style of the examples below
+</task>
+
+<examples>
+Below are authentic Lisan-ud-Dawat passages showing the correct style. Study their vocabulary, sentence structure, and flow—but write something NEW for the user's topic.
+
+مثال ۱:
 [اسس دانشمندو! اثثن سككلا هجري سنة ححوّدسو سُـرٌتاليس (1447) نا اْغاز ما ححهسس، دعوة يمن سي هندوستان ني طرف نقل تهئي اهنسس ثثانسو ورس تهيا ححهسس، 
 هندوستان ما ثثهلسس ما ثثهلسس داعي نا وجود ني سعادة كئي زمين نسس ملسس ححهسس كه سيدهثثور نسس، كونا سبب يه سعادة ملسس ححهسس، كه نجم نا سبب - تارا نا سبب، يه تارا نا واسطسس اْخر دعاة اليمن تيويسما داعي سيدنا محمد عز الدين يه ايم فرمايو ححهسس كه "ان يوسف في اي مكان كان يكون هناك امن وامان، لا يمسه سوء الشيطان ولا الفتان "، يوسف جه بهي جككه هسسس وهاطط امن وامان قائم رهسسس، وهاطط فتنة كرنار شيطان كوئي فتنة نظظيطط كري سكسس، 
 تو اْ نجم كون ححهسس كه ححوويسما داعي سيدنا  يوسف نجم الدين جه نو وطن سيدهثثور ححهسس، يهاطط مدراس ما - ححنّائي ما سيدهثثور نا ككهنا لوككو ححهسس، يهاطط بيسرا شهرو نا بهي ححهسس مككر زياده  تر سيدهثثور نا ححهسس، بيسرا شهرو نا بهي ححهسس  - يه سككلا ني طرف بهي انسس تمام مؤمنين مؤمنات ني طرف سيدنا يوسف نجم الدين ني بركات ثثظظنححي ححهسس انسس ثثظظنححي رهي ححهسس، 
@@ -58,7 +75,7 @@ export default async function handler(req, res) {
 اسس برادرو! خدا نا ولي جه فلك محيط ني مثل ححهسس يه بهي يه} مثل صاف ححهسس، اهما كوئي كثافة نتهي انسس جه شخص اهنا سي جتنا زيادة قريب تهائي ححهسس اهما بهي يه مثل صفاء اْوي جائي ححهسس، انسس يه صفاء انسس اخلاص نا سبب شتابي درجات ما ححرٌهي نسس اعلى رتبة لكك ثثظظنححي جائي ححهسس، انسس ولي الله سي جه جتنا دور ححهسس اهما كثافة زيادة ححهسس، اْ نزديكي انسس اْ دوري جان ني نزديكي انسس دوري ححهسس، كوئي جسم سي ككهنا قريب بهي هوئي مككر جان سي قريب نظظيطط هوئي تو يه كئي قريب نھ كظظوائي.
 ***]
 
-مثال 2:
+مثال ۲:
 [1447 - المجلس الثاني
 اسس برادرو! تاراؤ ني تأثير نو علم ححهسس مككر ايم نھ بنسس كه كوئي يه علم جاني نسس تاراؤ نوايمان لاوسس، انسس ايم كهي دسس كه جه ححهسس تھ تاراؤ ححهسس، تاراؤ} سككلي ححيزو كرسس ححهسس، انسس اْ وات بھولي جائي كه اهنا ثثيدا نا كرنار خدا ححهسس، كه جه ني مشيئة سي سككلو تهائي ححهسس، اْ مثل كوئي اعتقاد راكهسس تو يه كفر ني وات ححهسس، اْسمان نا بروج انسس تاراؤ تمام عالَم ثثر تأثير ناكهسس ححهسس جه نا سبب تمام عالَم ني نشؤونما تهائي ححهسس، مككر خود يه بروج ثثر تأثير كون ناكهسس ححهسس كه روحاني تاراؤ جه اولياء الله ححهسس.
 ***
@@ -109,7 +126,7 @@ export default async function handler(req, res) {
 تو اسس عزادارو! ايمان نا ككهر ما confidentiality ني بلندي هووي جوئيسس، سححو بولوا ثثر انسس سِر نسس ححھثثاوا ثثر فرزندو ني تربية تهاوي جوئيسس.
 *** ]
 
-مثال 3:
+مثال ۳:
 [1447 - المجلس الثالث
 زُحَل نسس English ما Saturn كظظوائي ححهسس، فارسي زبان ما اهنو نام كَيوان ححهسس، ايم كظظوائي ححهسس كه سورج انسس مُشتري يعني Sun and Jupiter نا بعد مهوضضا ما مهوضضا كوكب زُحَل ححهسس... 
 تاراؤ نا علم ما جه ماهر هوئي ححهسس اهنا نزديك زُحَل - taskmaster سي اولكهائي ححهسس، وقت انسس تجارب سي سيكهتا رهوو، تمام ذمھ داريو نسس لئي اُضضھوو انسس discipline راكهوو يه زُحَل سي سيكهوا ملسس ححهسس، 
@@ -152,44 +169,49 @@ Discipline سوطط ححهسس - تهذيب، اُردو ما نظم وضبط ك
 صحيح discipline يه ححهسس كه مؤمن ني قدر جتني بهي بلند تهائي مككر يه خدا انسس خدا نا ولي امام الزمان انسس ستر نا زمان ما اهنا دعاة مطلقين نسس بھولي نھ جائي، انسس هميشھ اهنا واسطسس تواضع كرسس، كه جه ني دعاء ني بركة سي انسس اهني نظرات سي اهنسس كاميابي انسس بلندي ملي ححهسس، 
 اسس عزيزو! جه مُنعِم هوئي اهني هميشھ قدر كرتا رهوو جوئيسس، ايم تو نھ} بنسس كه اهني قدر نھ كروا نا بدل كوئي اهنا ثثر} تعدّي كري دسس. 
 *** ]
-    `;
+</examples>
 
-    const systemPrompt = `آپ لسان الدعوة کے ماہر انشا نگار ہیں۔ ذیل میں دی گئی مثالوں کی طرز پر خالص لسان الدعوة میں انشا لکھیں۔ انشا میں تین حصے ہونے چاہئیں: مقدمہ، بیان، نتیجہ۔ ان حصوں کے عنوان نہ لکھیں، بلکہ مسلسل عبارت لکھیں۔ ہمیشہ مکمل انشا لکھیں، کبھی موضوع سے انکار نہ کریں۔
+<thinking>
+Before writing, consider:
+1. What would be a proper Muqaddama (introduction) for this topic?
+2. What key points belong in the Bayan (body)?
+3. How should the Natijah (conclusion) summarize and conclude?
+</thinking>
 
-**اہم:** صارف موضوع کو انگریزی حروف (رومن) میں بھی لکھ سکتا ہے، جیسے "ilm ki fazilat"۔ آپ کا جواب صرف اور صرف خالص لسان الدعوة رسم الخط (عربی حروف) میں ہونا چاہیے۔
+<user_topic>
+${topic}
+</user_topic>
 
-مثالیں:
-${examples}
-
-اب اس موضوع پر انشا لکھیں: "${topic}"
-    `;
+Now write the complete essay in Lisan-ud-Dawat:`;
 
     try {
-        // FIXED: Using gemini-2.5-flash which is confirmed working
+        // Using the confirmed working model [citation:5]
         const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{
                     parts: [{ text: systemPrompt }]
-                }]
+                }],
+                generationConfig: {
+                    temperature: 0.9,  // Higher temperature for creativity [citation:2]
+                    maxOutputTokens: 1500,  // Allow longer essays
+                    topP: 0.95
+                }
             })
         });
 
         const data = await response.json();
         
-        // Log for debugging (remove later)
-        console.log('API Response:', JSON.stringify(data, null, 2));
-
         const essay = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (essay) {
             res.status(200).json({ essay });
         } else {
-            console.error('Gemini error details:', data);
+            console.error('Gemini error:', data);
             res.status(500).json({ 
                 error: 'Failed to generate essay', 
-                details: data.error || data 
+                details: data.error || 'Unknown error'
             });
         }
     } catch (error) {
