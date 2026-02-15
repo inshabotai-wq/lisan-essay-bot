@@ -61,7 +61,7 @@
         }
 
         .splash-logo img {
-            height: 120px; /* scaled down from 1536x1024 */
+            height: 120px;
             width: auto;
             margin-bottom: 1rem;
             filter: drop-shadow(0 0 30px #fbbf24);
@@ -153,7 +153,7 @@
         }
 
         .logo-area img {
-            height: 50px; /* scaled down */
+            height: 50px;
             width: auto;
             filter: drop-shadow(0 0 10px #fbbf24);
         }
@@ -179,7 +179,8 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 2rem;
+            gap: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .tagline {
@@ -192,8 +193,8 @@
             padding-left: 1.5rem;
         }
 
-        /* About pill button */
-        .about-pill {
+        /* Pill buttons */
+        .pill {
             background: rgba(245, 158, 11, 0.1);
             border: 1px solid rgba(245, 158, 11, 0.3);
             border-radius: 40px;
@@ -207,10 +208,14 @@
             white-space: nowrap;
         }
 
-        .about-pill:hover {
+        .pill:hover {
             background: rgba(245, 158, 11, 0.25);
             border-color: #fbbf24;
             box-shadow: 0 0 15px #fbbf24;
+        }
+
+        .pill i {
+            margin-right: 6px;
         }
 
         /* Hero */
@@ -279,18 +284,32 @@
             color: #fbbf24;
         }
 
-        /* Input card */
-        .input-card {
+        /* Input row */
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .input-label {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #fde68a;
+            white-space: nowrap;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
             background: rgba(20, 30, 50, 0.4);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 60px;
-            padding: 0.8rem 0.8rem 0.8rem 2rem;
-            display: flex;
+            padding: 0.5rem 0.5rem 0.5rem 2rem;
             align-items: center;
             gap: 0.8rem;
-            margin-bottom: 4rem;
-            box-shadow: 0 25px 45px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset;
             transition: box-shadow 0.3s ease;
             animation: pulseGlow 2s 3;
         }
@@ -301,12 +320,12 @@
             100% { box-shadow: 0 25px 45px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset; }
         }
 
-        .input-card:focus-within {
+        .input-wrapper:focus-within {
             box-shadow: 0 30px 55px -10px #fbbf24, 0 0 0 2px #fbbf24 inset;
             animation: none;
         }
 
-        .input-card i {
+        .input-wrapper i {
             color: #7f8fb2;
             font-size: 1.5rem;
         }
@@ -316,7 +335,7 @@
             background: transparent;
             border: none;
             outline: none;
-            font-family: 'LisanFont', 'Noto Naskh Arabic', 'Outfit', sans-serif;
+            font-family: 'Outfit', sans-serif;  /* clean font for input */
             font-size: 1.3rem;
             color: white;
             padding: 1rem 0;
@@ -325,9 +344,38 @@
         #topic::placeholder {
             color: #5f6f92;
             font-weight: 300;
-            font-family: 'Outfit', sans-serif;
         }
 
+        /* Essay type dropdown */
+        .type-select {
+            background: rgba(20, 30, 50, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            color: #fde68a;
+            outline: none;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23fbbf24' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1.5rem center;
+            background-size: 1.2rem;
+            padding-right: 3.5rem;
+        }
+
+        .type-select option {
+            background: #1a1f30;
+            color: #e0e4f0;
+        }
+
+        .type-select:hover {
+            border-color: #fbbf24;
+        }
+
+        /* Generate button */
         .generate-btn {
             background: linear-gradient(145deg, #fbbf24, #d97706);
             border: none;
@@ -435,6 +483,36 @@
             font-family: 'Outfit', sans-serif;
             direction: ltr;
             font-size: 1.3rem;
+        }
+
+        /* Loading animation */
+        .loading-animation {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .loading-animation i {
+            font-size: 4rem;
+            color: #fbbf24;
+            margin-bottom: 20px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .loading-animation p {
+            color: #a6b0cc;
+            font-size: 1.3rem;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.6; transform: scale(1); }
+        }
+
+        /* Word count */
+        .word-count {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #a0aec0;
+            text-align: right;
+            padding-right: 1rem;
         }
 
         /* Export buttons */
@@ -626,13 +704,15 @@
                 align-items: flex-start;
                 gap: 1rem;
             }
-            .input-card {
-                flex-wrap: wrap;
-                background: transparent;
-                backdrop-filter: none;
-                border: none;
-                padding: 0;
-                gap: 1rem;
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .input-label {
+                text-align: center;
+            }
+            .type-select {
+                width: 100%;
             }
             .generate-btn {
                 width: 100%;
@@ -685,8 +765,11 @@
                 </div>
                 <div class="header-right">
                     <div class="tagline">Insha Generator · Pure Lisan‑ud‑Dawat</div>
-                    <div class="about-pill" onclick="showModal('underConstruction')">
-                        <i class="fas fa-info-circle" style="margin-right: 6px;"></i> About
+                    <div class="pill" onclick="showModal('disclaimer')">
+                        <i class="fas fa-info-circle"></i> Disclaimer
+                    </div>
+                    <div class="pill" onclick="showModal('underConstruction')">
+                        <i class="fas fa-pen-fancy"></i> About
                     </div>
                 </div>
             </header>
@@ -698,22 +781,32 @@
                     <span class="hero-sub">AI‑Powered Essays</span>
                 </h1>
                 <div class="hero-desc">
-                    Authentic Lisan‑ud‑Dawat, structured Muqaddama → Bayan → Natijah, generated instantly.
+                    Authentic Lisan‑ud‑Dawat, structured Muqaddama → Bayan → Natijah, with Quran & Hadith.
                 </div>
             </div>
 
-            <!-- Disclaimer Banner -->
+            <!-- Disclaimer Banner (still present) -->
             <div class="disclaimer-banner">
                 <i class="fas fa-language"></i>
                 <span><strong>Type your topic in any script (Urdu, Arabic, English/Roman).</strong> The essay will always be generated in pure Lisan‑ud‑Dawat script.</span>
             </div>
 
-            <!-- Input area -->
-            <div class="input-card">
-                <i class="fas fa-pen"></i>
-                <input type="text" id="topic" placeholder="e.g., ilm ki fazilat, والدین کی خدمت, رمضان کے برکات" dir="auto" autofocus>
+            <!-- Input row with fixed text and dropdown -->
+            <div class="input-row">
+                <span class="input-label">Write a insha on</span>
+                <div class="input-wrapper">
+                    <i class="fas fa-pen"></i>
+                    <input type="text" id="topic" placeholder="e.g., ilm ki fazilat, والدین کی خدمت" dir="auto" autofocus>
+                </div>
+                <select id="essayType" class="type-select">
+                    <option value="Expository">Expository</option>
+                    <option value="Descriptive">Descriptive</option>
+                    <option value="Analytical">Analytical</option>
+                    <option value="Narrative">Narrative</option>
+                    <option value="Other">Other</option>
+                </select>
                 <button class="generate-btn" id="generateBtn" onclick="generateEssay()">
-                    <span>Generate Essay</span>
+                    <span>Generate</span>
                     <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
@@ -731,6 +824,8 @@
                             <p>Enter a topic above and generate a masterpiece.</p>
                         </div>
                     </div>
+                    <!-- Word count display -->
+                    <div class="word-count" id="wordCount"></div>
                 </div>
                 <!-- Export buttons (hidden initially) -->
                 <div class="export-buttons" id="exportButtons" style="display: none;">
@@ -787,12 +882,12 @@
             let title, content;
             if (type === 'about') {
                 title = 'About Al Lisan';
-                content = `<p>Al Lisan is an AI‑powered tool that generates high‑quality essays in pure Lisan‑ud‑Dawat, the language of the Dawoodi Bohra community. It follows the classical structure: <strong>Muqaddama</strong> (introduction), <strong>Bayan</strong> (detailed discussion), and <strong>Natijah</strong> (conclusion).</p>
+                content = `<p>Al Lisan is an AI‑powered tool that generates high‑quality essays in pure Lisan‑ud‑Dawat, the language of the Dawoodi Bohra community. It follows the classical structure: <strong>Muqaddama</strong> (introduction), <strong>Bayan</strong> (detailed discussion), and <strong>Natijah</strong> (conclusion), enriched with Quranic verses and Hadith.</p>
                           <p><strong>Features:</strong></p>
                           <ul>
                               <li>Accepts topics in any script (English, Urdu, Arabic, Roman)</li>
                               <li>Always outputs in authentic Lisan‑ud‑Dawat script</li>
-                              <li>Powered by advanced AI, fine‑tuned with real sermon examples</li>
+                              <li>Powered by advanced AI, guided by community sermons (style only, never copied)</li>
                               <li>Free for the community, with no login required</li>
                           </ul>`;
             } else if (type === 'privacy') {
@@ -804,6 +899,10 @@
                 content = `<p>This project is in active development. We are continuously improving the AI to deliver even more authentic and refined essays in Lisan‑ud‑Dawat.</p>
                           <p>Stay tuned – many exciting updates are on the way! Your feedback is always welcome.</p>
                           <p><i class="fas fa-heart" style="color: #fbbf24;"></i> Thank you for being part of this journey.</p>`;
+            } else if (type === 'disclaimer') {
+                title = 'Disclaimer';
+                content = `<p>This AI tool is under active development. While we strive for accuracy, responses may occasionally be imperfect or contain errors. The AI is trained on the <em>style</em> of authentic sermons but cannot replicate actual Sermon Bayan or Kalaam – those remain the preserve of our community's living tradition.</p>
+                          <p>Always refer to qualified scholars for religious matters. Use this tool as a learning aid, not as a definitive source.</p>`;
             }
             modalBody.innerHTML = `<h3>${title}</h3>${content}`;
             modalOverlay.style.display = 'flex';
@@ -818,11 +917,19 @@
         // Global variable for current essay
         let currentEssay = '';
 
+        // Word count function
+        function countWords(str) {
+            return str.trim().split(/\s+/).length;
+        }
+
         // Essay generation function
         async function generateEssay() {
             const topicInput = document.getElementById('topic');
             const topic = topicInput.value.trim();
+            const typeSelect = document.getElementById('essayType');
+            const essayType = typeSelect.value;
             const resultDiv = document.getElementById('result');
+            const wordCountSpan = document.getElementById('wordCount');
             const generateBtn = document.getElementById('generateBtn');
             const btnText = generateBtn.querySelector('span');
             const btnIcon = generateBtn.querySelector('.fa-arrow-right');
@@ -833,7 +940,7 @@
                 return;
             }
 
-            // Loading state
+            // Loading state – beautiful animation
             const originalBtnText = btnText.innerText;
             btnText.innerText = 'Generating';
             btnIcon.style.display = 'none';
@@ -851,27 +958,34 @@
                 document.head.appendChild(style);
             }
 
-            // Show loading in result
+            // Show loading in result with new animation
             resultDiv.innerHTML = `
-                <div style="text-align: center; padding: 80px 20px;">
-                    <i class="fas fa-circle-notch fa-spin" style="font-size: 4rem; color: #fbbf24; margin-bottom: 20px;"></i>
-                    <p style="color: #a6b0cc; font-size: 1.3rem;">Crafting your essay in Lisan‑ud‑Dawat...</p>
+                <div class="loading-animation">
+                    <i class="fas fa-feather-alt"></i>
+                    <p>Crafting your essay in Lisan‑ud‑Dawat...</p>
                 </div>
             `;
+            wordCountSpan.innerHTML = '';
             exportButtons.style.display = 'none';
 
             try {
                 const response = await fetch('/api/gemini', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ topic })
+                    body: JSON.stringify({ topic, type: essayType })
                 });
 
                 const data = await response.json();
 
                 if (data.essay) {
-                    currentEssay = data.essay;
-                    resultDiv.innerHTML = `<div style="direction: rtl; text-align: right;">${data.essay.replace(/\n/g, '<br>')}</div>`;
+                    // Append the two required lines
+                    const footerLine1 = "اطال الله عمر سيدنا مُـفـضّـل سـيـفُ ٱلـدّين الى يوم الدين. امين";
+                    const footerLine2 = "you will have to add Sermon bayan and Kalaam , check disclaimer for more info.";
+                    let fullEssay = data.essay + "\n\n" + footerLine1 + "\n" + footerLine2;
+                    currentEssay = fullEssay;
+                    resultDiv.innerHTML = `<div style="direction: rtl; text-align: right;">${fullEssay.replace(/\n/g, '<br>')}</div>`;
+                    const wordCount = countWords(fullEssay);
+                    wordCountSpan.innerHTML = `📝 Word count: ${wordCount} (max 1000)`;
                     exportButtons.style.display = 'flex';
                 } else {
                     currentEssay = '';
@@ -904,7 +1018,7 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const splitText = doc.splitTextToSize(currentEssay, 180);
-            doc.setFont('LisanFont', 'normal'); // Note: jsPDF may not support custom fonts easily; fallback to standard
+            // Note: jsPDF may not support custom fonts; fallback to standard.
             doc.text(splitText, 15, 20);
             doc.save('Al_Lisan_Essay.pdf');
         }
