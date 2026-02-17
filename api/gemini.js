@@ -3,53 +3,69 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { topic, type } = req.body;
+    const { topic, type, words, includeAyah } = req.body;
     if (!topic) {
         return res.status(400).json({ error: 'Topic is required' });
     }
 
     const GEMINI_API_KEY = process.env.GEMINI_KEY;
 
-    // ========== PASTE SHORT STYLE EXCERPTS BELOW ==========
-    // Use 2-3 very short phrases (one sentence each) to convey tone.
-    // These are just to remind the AI of the flavor, not to provide content.
-    const styleHints = `[Paste a short phrase showing respectful tone, e.g., "الحمدللہ رب العالمین"]
-[Paste a phrase with typical vocabulary, e.g., "علم کی فضیلت بہت عظیم ہے"]
-[Paste a concluding phrase, e.g., "واللہ اعلم بالصواب"]`;
-    // =======================================================
+    // ========== PASTE YOUR SHORT STYLE HINTS BELOW ==========
+    // 3-5 short phrases (one line each) that capture Lisan-ud-Dawat flavor.
+    // Examples: "الحمدللہ رب العالمین", "علم کی فضیلت بہت عظیم ہے", etc.
+    const styleHints = `الفلك المحيط اْ دنيا نا عالم ما تمام حركة نا اصل ححهسس... فلك محيط ني حركة سي} تمام خلقة نو وجود ححهسس، اهنا ثثھروا  نا سبب} تمام افلاك انسس تاراؤ ثثھرسس ححهسس، 
+... هر زمان ما حق نا صاحب نو مقام - الفلك المحيط ني مثل ححهسس، يه مؤمنين نسس هداية دسس ححهسس تو ثثهلسس خود حركة كرسس ححهسس، عمل كرسس ححهسس، انسس ثثححھي مؤمنين نسس حركة كراوسس ححهسس، عمل كراوسس ححهسس ...
+هوسس جه شخص ني position اهوي هوئي كه اهنا ككهر ما، يا مجتمع ما، يا تعليم نا ميدان ما، يا ويثثار نا مجال ما مهوضضا هوئي...
+اككر جو يه خود عمل كري نسس كوئي وات كهسسس تو اهنو اثر جُدو} ثثرٌسسس، ايم كظظوائي ححهسس، English نا اندر اداء كريئسس كه
+"Actions speak louder than words."`;
+    // ========================================================
+
+    const ayahInstruction = includeAyah
+        ? "In the Bayan, include **at least one Quranic verse** (with reference, e.g., 'سورۃ البقرۃ آیت ۲۸۶') and **one authentic Hadith** (e.g., 'قال رسول الله ﷺ') that are relevant to the topic."
+        : "Do **not** include any Quranic verses or Hadith. Write a purely expository/descriptive essay based on the topic.";
 
     const systemPrompt = `
-# CORE TASK
-You are an expert writer in Lisan-ud-Dawat. Write a **completely original** essay in pure Lisan-ud-Dawat about the following topic:
+You are a master writer of **insha** (essays) in **Lisan-ud-Dawat**, the language of the Dawoodi Bohra community. You are also an expert in English composition
+and Islamic knowledge. All the exampales are style guides to learn fromand are not context to copy from. 
+You know that lisa ud dawat has their diffrent alphabeta which are not in arabic,
+ so you have understood it and leearn the launguage as it is.
 
-**Topic:** ${topic}
+## UNDERSTANDING INSHA TYPES
+- **Expository**: Explains or informs about a topic objectively.
+- **Descriptive**: Paints a vivid picture using sensory details.
+- **Analytical**: Breaks down a topic into parts and examines relationships.
+- **Narrative**: Tells a story or recounts events.
 
-The essay must be **${type || 'General'}** in style (if "Other", use a balanced style).
+## YOUR TASK
+The user has provided a **topic**, an **insha type**, a **desired word count** (approximately ${words} words), and a request to ${includeAyah ? "include" : "exclude"} Quranic verses and Hadith.
 
-# STRUCTURE (do NOT use headings)
-1. **Muqaddama (مقدمہ)** – introduce the topic gracefully.
-2. **Bayan (بیان)** – develop the topic logically, including **at least one Quranic verse** (with reference, e.g., "سورۃ البقرۃ آیت ۲۸۶") and **one authentic Hadith** (e.g., "قال رسول الله ﷺ") that are relevant to the topic.
-3. **Natijah (نتیجہ)** – conclude thoughtfully, possibly with a prayer or moral.
+Follow these internal steps (but output only the final Lisan-ud-Dawat essay):
 
-# STYLE GUIDANCE
-The following short phrases illustrate the desired tone and vocabulary. Study them, but **create entirely new sentences** – do not copy them.
---- STYLE HINTS ---
+1. **English Essay Drafting**: Create a coherent English essay on the topic, following the specified type and roughly ${words} words. Use proper structure (introduction, body, conclusion). Do not output this draft.
+2. **Translation & Transformation**: Convert the English essay into pure **Lisan-ud-Dawat**, adapting it to the authentic style. Use the style hints below as a guide for tone, vocabulary, and rhythm. Ensure the Lisan-ud-Dawat version flows naturally with:
+   - **Muqaddama** (introduction)
+   - **Bayan** (body, with logical development)
+   - **Natijah** (conclusion)
+   Do **not** include any headings – just the text.
+3. **Apply Ayah/Hadith Instruction**: ${ayahInstruction}
+4. **Final Output**: Produce only the Lisan-ud-Dawat essay – no English, no notes, no explanations.
+
+## STYLE HINTS (short phrases illustrating Lisan-ud-Dawat flavor)
 ${styleHints}
---- END HINTS ---
 
-# CRITICAL RULES
-- **Never copy any example text** – every sentence must be original.
-- **Never include headings** like "مقدمہ:" – just write flowing text.
-- **Do not mention any Sahabah, Khalifas, or contemporary figures by name** – only Allah and the Prophet ﷺ may be referenced.
-- **Do not fabricate Quranic verses or Hadith** – use only authentic ones you know.
-- **Length: approximately 200 words** (the user requested this). Be concise but rich.
-- **Output only the essay** – no commentary, no notes, no translations.
-- **Write in pure Lisan-ud-Dawat script** – ignore any Roman letters in the topic.
+## USER REQUEST
+- **Topic**: ${topic}
+- **Type**: ${type}
+- **Desired Word Count**: approximately ${words} words
+- **Include Ayah & Hadith**: ${includeAyah ? "Yes" : "No"}
 
-# YOUR ESSAY (begin directly):
+Now generate the Lisan-ud-Dawat essay:
 `;
 
     try {
+        // Estimate tokens: words * 2 (Arabic uses more characters) + buffer
+        const maxTokens = Math.min(parseInt(words) * 2 + 500, 4000);
+
         const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -59,7 +75,7 @@ ${styleHints}
                 }],
                 generationConfig: {
                     temperature: 1.0,
-                    maxOutputTokens: 800,      // ~400-500 words, enough for 200 words
+                    maxOutputTokens: maxTokens,
                     topP: 0.95,
                     topK: 40
                 }
