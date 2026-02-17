@@ -10,16 +10,18 @@ export default async function handler(req, res) {
 
     const GEMINI_API_KEY = process.env.GEMINI_KEY;
 
-    // Short style hints (replace with your own if desired)
+    // Short style hints – replace with your own if desired
     const styleHints = `صراط مستقيم ثثر ححلوو ككهنو سهل ححهسس، سيدنا المؤيد الشيرازي فرماوسس ححهسس كه: 
 وكونه ممدا على سقر * احد من سيف ادق من شعر
-صراط مستقيم ني ايك صفة سوطط ححهسس كه يه تلوار ني دهار كرتا بهي تيز ححهسس، يعني سوطط كه جه مثل تيز تلوار هر ححيز
-نسس كاثثي دسس ححهسس يه} مثل صراط مستقيم - جه حق نو راستھ ححهسس - يه تمام مشكلو نسس كاثثي دسس ححهسس، اهنا ثثر ححلنار سي هر دُشوارككي دور تهئي جائي ححهسس، 
-هوسس صراط مستقيم ني بيجي صفة سوطط ححهسس كه يه بال كرتا بهي زيادة باريك ححهسس، يعني جنة نو راستھ - يه راستھ ثثر ححلنار ني زندككي نا هر امر ما، يهاطط لكك كه 
-باريك ما باريك امر ما بهي اهنسس هداية دسس ححهسس كه تميطط اْم كرو، اْم نھ كرو، انسس ايم بهي هداية دسس ححهسس كه تميطط اْم 
-نھ كري سكتا هوئي تو اْم كرو، يه بهي نھ كري سكتا هوئي تو اْم كرو، يعني ايم هداية دسس ححهسس كه شريعة ما ككهني وُسعة ححهسس، اهنا مطابق عمل كروو ككهنو سهل ححهسس`;
+صراط مستقيم ني ايك صفة سوطط ححهسس كه يه تلوار ني دهار كرتا بهي تيز ححهسس، يعني 
+سوطط كه جه مثل تيز تلوار هر ححيز نسس كاثثي دسس ححهسس يه} مثل صراط مستقيم - جه حق نو راستھ ححهسس 
+- يه تمام مشكلو نسس كاثثي دسس ححهسس، اهنا ثثر ححلنار سي هر دُشوارككي دور تهئي جائي ححهسس، 
+هوسس صراط مستقيم ني بيجي صفة سوطط ححهسس كه
+يه بال كرتا بهي زيادة باريك ححهسس، يعني جنة نو راستھ - يه راستھ ثثر ححلنار ني زندككي نا هر امر ما، يهاطط لكك كه باريك ما باريك امر ما بهي اهنسس هداية 
+دسس ححهسس كه تميطط اْم كرو، اْم نھ كرو، انسس ايم بهي هداية دسس ححهسس كه تميطط اْم نھ كري سكتا هوئي تو اْم كرو، يه بهي نھ كري سكتا 
+هوئي تو اْم كرو، يعني ايم هداية دسس ححهسس كه شريعة ما ككهني وُسعة ححهسس، اهنا مطابق عمل كروو ككهنو سهل ححهسس`;
 
-    // Description of essay types
+    // Essay type descriptions
     const typeDescription = {
         Expository: "Explains or informs about a topic objectively. Focus on clarity and facts.",
         Descriptive: "Paints a vivid picture using sensory details. Use rich, evocative language.",
@@ -35,14 +37,17 @@ export default async function handler(req, res) {
     const systemPrompt = `
 You are a master essay writer in **Lisan-ud-Dawat**, the language of the Dawoodi Bohra community.
 You write in pure Lisan-ud-Dawat – a natural mix of Arabic, Urdu, and Gujarati written in Arabic script.
-You can use English or Roman letters in the essay. All the exampales are style guides to learn fromand are not context to copy from. 
-You know that lisa ud dawat has their diffrent alphabeta which are not in arabic,
+You can use English or Roman letters in the essay. All the exampales are style guides to learn fromant, they are 
+not context to copy from. 
+You know that lisa ud dawat has their diffrent alphabet which are not in arabic,
  so you have understood it and leearn the launguage as it is.
+
+## CRITICAL INSTRUCTION – WORD COUNT
+The user has requested an essay of **at least ${words} words**. You MUST write a complete essay that reaches this length. Do NOT stop until you have written at least ${words} words. If you finish the main ideas early, continue by adding more details, examples, explanations, or relevant quotations to expand the essay. Under no circumstances should you output a short response.
 
 ## TASK
 Write a **complete, well-structured** essay in **pure Lisan-ud-Dawat** on the topic: "${topic}".
 The essay must follow the **${type}** style. Style description: ${typeDescription[type] || typeDescription.Other}.
-Length: **at least ${words} words**. Do not stop until the essay is complete and meets the word count.
 
 ## STRUCTURE (do NOT use headings)
 Your essay must have these three parts in order, flowing naturally:
@@ -57,12 +62,12 @@ Your essay must have these three parts in order, flowing naturally:
 - Do **not** mention any Sahabah, Khalifas, or contemporary figures by name – only Allah and the Prophet ﷺ may be referenced.
 
 ## OUTPUT
-Return **only the essay text** – no headings, no notes, no explanations. The essay should be a single block of text (paragraphs separated by blank lines) in Lisan-ud-Dawat script.
+Return **only the essay text** – no headings, no notes, no explanations. The essay should be a single block of text (paragraphs separated by blank lines) in Lisan-ud-Dawat script. Remember: it must be at least ${words} words long.
 `;
 
     try {
-        // Tokens: roughly words * 2.5 (since Arabic is denser) + buffer
-        const maxTokens = Math.min(parseInt(words) * 3 + 600, 6000);
+        // Tokens: roughly words * 2.5 (since Arabic is denser) + a large buffer
+        const maxTokens = Math.min(parseInt(words) * 4 + 800, 8000); // very generous
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
@@ -72,7 +77,7 @@ Return **only the essay text** – no headings, no notes, no explanations. The e
                     parts: [{ text: systemPrompt }]
                 }],
                 generationConfig: {
-                    temperature: 0.9,          // balanced creativity
+                    temperature: 0.9,
                     maxOutputTokens: maxTokens,
                     topP: 0.95,
                     topK: 40
