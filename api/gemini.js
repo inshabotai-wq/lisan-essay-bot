@@ -10,61 +10,44 @@ export default async function handler(req, res) {
 
     const GEMINI_API_KEY = process.env.GEMINI_KEY;
 
-    // ========== PASTE YOUR SHORT STYLE HINTS BELOW ==========
-    // 3-5 short phrases (one line each) that capture Lisan-ud-Dawat flavor.
-    // Examples: "الحمدللہ رب العالمین", "علم کی فضیلت بہت عظیم ہے", etc.
-    const styleHints = `الفلك المحيط اْ دنيا نا عالم ما تمام حركة نا اصل ححهسس... فلك محيط ني حركة سي} تمام خلقة نو وجود ححهسس، اهنا ثثھروا  نا سبب} تمام افلاك انسس تاراؤ ثثھرسس ححهسس، 
-... هر زمان ما حق نا صاحب نو مقام - الفلك المحيط ني مثل ححهسس، يه مؤمنين نسس هداية دسس ححهسس تو ثثهلسس خود حركة كرسس ححهسس، عمل كرسس ححهسس، انسس ثثححھي مؤمنين نسس حركة كراوسس ححهسس، عمل كراوسس ححهسس ...
-هوسس جه شخص ني position اهوي هوئي كه اهنا ككهر ما، يا مجتمع ما، يا تعليم نا ميدان ما، يا ويثثار نا مجال ما مهوضضا هوئي...
-اككر جو يه خود عمل كري نسس كوئي وات كهسسس تو اهنو اثر جُدو} ثثرٌسسس، ايم كظظوائي ححهسس، English نا اندر اداء كريئسس كه
-"Actions speak louder than words."`;
-    // ========================================================
+    // Short style hints (replace with your own)
+    const styleHints = `و جه مثل افلاك انسس خصوصًا فلك البروج ككهنا محفوظ ححهسس انسس ككهنا بلند ححهسس، يه} مثل سازوار ححهسس كه مؤمنين نا ككهرو ما بروج ني خوبيو هوئي، 
+يھ سوطط؟ كه مؤمنين انسس مؤمنين نا ككهرو انسس يه سككلا ني هر ححيز بلندي ني نهاية ثثر هوئي انسس محفوظ هوئي، انسس جه مثل تاراؤ اولياء الله ني تأثير قبول كرسس ححهسس يه} مثل مؤمنين انسس مؤمنين نا ككهرو هوئي، جه ما يه سككلا انسس اهنا فرزندو ولي  الله ني تأثير قبول كرتا هوئي،
+امام احمد المستور يه مدينة فاضلة روحانية ني ذكر فرماوي، انسس ايم واضح كيدو ححهسس كه هر مؤمن نو ككهر يه شان نو هوئي كه زمين نا لوككو نا بد  اخلاق نو اثر اهنا ثثر نھ ثثرٌسس، باطل نا لوككو نا علم نا موج نو اثر بهي اهنا ثثر نھ ثثرٌسس، خراب عقيدة نو دُهنوو بهي اهني طرف نھ ححرٌهسس، بلكه هر مؤمن نو ككهر اتنو بلند هوئي كه بيسرا ككهرو ثثر اشراف كرسس، يعني مؤمن نو ككهر بيسرا لوككو واسطسس خير ني مثال بنسس، سككلا ايم ححاهسس كه سككلا نا ككهرو بهي مؤمن نا ككهر ني مثل بلند انسس محفوظ هوئي. 
+`;
 
     const ayahInstruction = includeAyah
-        ? "In the Bayan, include **at least one Quranic verse** (with reference, e.g., 'سورۃ البقرۃ آیت ۲۸۶') and **one authentic Hadith** (e.g., 'قال رسول الله ﷺ') that are relevant to the topic."
-        : "Do **not** include any Quranic verses or Hadith. Write a purely expository/descriptive essay based on the topic.";
+        ? "Include at least one Quranic verse (with reference, e.g., 'سورۃ البقرۃ آیت ۲۸۶') and one authentic Hadith (e.g., 'قال رسول الله ﷺ') relevant to the topic."
+        : "Do not include any Quranic verses or Hadith. Write a purely expository/descriptive essay.";
 
     const systemPrompt = `
-You are a master writer of **insha** (essays) in **Lisan-ud-Dawat**, the language of the Dawoodi Bohra community. You are also an expert in English composition
-and Islamic knowledge. All the exampales are style guides to learn fromand are not context to copy from. 
+You are a master essay writer in Lisan-ud-Dawat, the language of the Dawoodi Bohra community. All the exampales are style guides to learn fromand are not context to copy from. 
 You know that lisa ud dawat has their diffrent alphabeta which are not in arabic,
  so you have understood it and leearn the launguage as it is.
 
-## UNDERSTANDING INSHA TYPES
-- **Expository**: Explains or informs about a topic objectively.
-- **Descriptive**: Paints a vivid picture using sensory details.
-- **Analytical**: Breaks down a topic into parts and examines relationships.
-- **Narrative**: Tells a story or recounts events.
+## TASK
+Write a **complete** essay in pure Lisan-ud-Dawat on the topic: "${topic}".
+The essay style must be: **${type}**.
+Length: approximately ${words} words. Do not stop until the essay is complete.
 
-## YOUR TASK
-The user has provided a **topic**, an **insha type**, a **desired word count** (approximately ${words} words), and a request to ${includeAyah ? "include" : "exclude"} Quranic verses and Hadith.
+## STRUCTURE (do NOT use headings)
+- **Muqaddama** (introduction)
+- **Bayan** (body, with logical development)
+- **Natijah** (conclusion)
 
-Follow these internal steps (but output only the final Lisan-ud-Dawat essay):
-
-1. **English Essay Drafting**: Create a coherent English essay on the topic, following the specified type and roughly ${words} words. Use proper structure (introduction, body, conclusion). Do not output this draft.
-2. **Translation & Transformation**: Convert the English essay into pure **Lisan-ud-Dawat**, adapting it to the authentic style. Use the style hints below as a guide for tone, vocabulary, and rhythm. Ensure the Lisan-ud-Dawat version flows naturally with:
-   - **Muqaddama** (introduction)
-   - **Bayan** (body, with logical development)
-   - **Natijah** (conclusion)
-   Do **not** include any headings – just the text.
-3. **Apply Ayah/Hadith Instruction**: ${ayahInstruction}
-4. **Final Output**: Produce only the Lisan-ud-Dawat essay – no English, no notes, no explanations.
-
-## STYLE HINTS (short phrases illustrating Lisan-ud-Dawat flavor)
+## REQUIREMENTS
+- ${ayahInstruction}
+- Use the following phrases as style inspiration (but do not copy them directly):
 ${styleHints}
+- Do not mention any Sahabah, Khalifas, or contemporary figures by name.
+- Write only in Lisan-ud-Dawat script. The user may have typed the topic in Roman letters – ignore that and output only in Lisan-ud-Dawat.
 
-## USER REQUEST
-- **Topic**: ${topic}
-- **Type**: ${type}
-- **Desired Word Count**: approximately ${words} words
-- **Include Ayah & Hadith**: ${includeAyah ? "Yes" : "No"}
-
-Now generate the Lisan-ud-Dawat essay:
+## OUTPUT
+Return only the essay text – no headings, no commentary, no explanations.
 `;
 
     try {
-        // Estimate tokens: words * 2 (Arabic uses more characters) + buffer
-        const maxTokens = Math.min(parseInt(words) * 2 + 500, 4000);
+        const maxTokens = Math.min(parseInt(words) * 3 + 500, 4000); // generous
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
