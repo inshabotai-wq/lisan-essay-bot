@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -10,8 +10,7 @@ export default async function handler(req, res) {
 
     const GEMINI_API_KEY = process.env.GEMINI_KEY;
 
-    // ========== STYLE EXAMPLES (short, authentic Lisan-ud-Dawat phrases) ==========
-    // Replace these with your own if desired – they set the tone.
+    // Style examples – keep these as plain strings
     const styleExamples = `1447 - المجلس الثالث
 زُحَل نسس English ما Saturn كظظوائي ححهسس، فارسي زبان ما اهنو نام كَيوان ححهسس، ايم كظظوائي ححهسس كه سورج انسس مُشتري يعني Sun and Jupiter نا بعد مهوضضا ما مهوضضا كوكب زُحَل ححهسس... 
 تاراؤ نا علم ما جه ماهر هوئي ححهسس اهنا نزديك زُحَل - taskmaster سي اولكهائي ححهسس، وقت انسس تجارب سي سيكهتا رهوو، تمام ذمھ داريو نسس لئي اُضضھوو انسس discipline راكهوو يه زُحَل سي سيكهوا ملسس ححهسس، 
@@ -54,56 +53,51 @@ Discipline سوطط ححهسس - تهذيب، اُردو ما نظم وضبط ك
 صحيح discipline يه ححهسس كه مؤمن ني قدر جتني بهي بلند تهائي مككر يه خدا انسس خدا نا ولي امام الزمان انسس ستر نا زمان ما اهنا دعاة مطلقين نسس بھولي نھ جائي، انسس هميشھ اهنا واسطسس تواضع كرسس، كه جه ني دعاء ني بركة سي انسس اهني نظرات سي اهنسس كاميابي انسس بلندي ملي ححهسس، 
 اسس عزيزو! جه مُنعِم هوئي اهني هميشھ قدر كرتا رهوو جوئيسس، ايم تو نھ} بنسس كه اهني قدر نھ كروا نا بدل كوئي اهنا ثثر} تعدّي كري دسس. 
 *** `;
-    // =============================================================================
 
     const typeDescription = {
-        Expository: "Explains or informs objectively. Focus on clarity and facts.",
-        Descriptive: "Paints a vivid picture using sensory details. Rich, evocative language.",
-        Analytical: "Breaks down a topic and examines relationships. Logical reasoning.",
-        Narrative: "Tells a story or recounts events. Clear sequence and engaging flow.",
-        Other: "Balanced style, suitable for general topics."
+        Expository: "Explains or informs objectively.",
+        Descriptive: "Paints a vivid picture.",
+        Analytical: "Breaks down and examines.",
+        Narrative: "Tells a story.",
+        Other: "Balanced style."
     };
 
     const ayahInstruction = includeAyah
-        ? "In the Bayan, include **at least one Quranic verse** (with reference, e.g., 'سورۃ البقرۃ آیت ۲۸۶') and **one authentic Hadith** (e.g., 'قال رسول الله ﷺ') that are relevant to the topic. Use them naturally within the discussion."
-        : "Do **not** include any Quranic verses or Hadith. Write a purely expository/descriptive essay.";
+        ? "Include at least one Quranic verse (with reference) and one authentic Hadith relevant to the topic."
+        : "Do not include any Quranic verses or Hadith.";
 
-    // Custom opening instruction for the specific topic "mari mohabbat"
-    // (We'll make it generic but applicable to any love-related topic)
-    const openingInstruction = `
+    const openingInstruction = topic.includes("محبت") || topic.includes("mohabbat")
+        ? "Start by describing worldly love, then transition to love for Aale Muhammad."
+        : "";
 
     const systemPrompt = `
-You are a master essay writer in **Lisan-ud-Dawat**, the language of the Dawoodi Bohra community. All the exampales are style guides to learn fromand are not context to copy from. 
+You are a master essay writer in **Lisan-ud-Dawat**. Write in pure Lisan-ud-Dawat (Arabic script, authentic vocabulary). All the exampales are style guides to learn fromand are not context to copy from. 
 You know that lisa ud dawat has their diffrent alphabeta which are not in arabic,
- so you have understood it and leearn the launguage as it is. You write in pure Lisan-ud-Dawat – a natural blend of Arabic, Urdu, and Gujarati words written in Arabic script. You never use English or Roman letters, and you avoid words that are simple transliterations (like "love" written as "لَو"). Instead, use authentic vocabulary: e.g., "محبت" for love, "دنیا" for world, etc. Your essays should sound like traditional Dawoodi Bohra sermons.
+ so you have understood it and leearn the launguage as it is.
 
-## CRITICAL INSTRUCTION – WORD COUNT
-The user has requested an essay of **at least ${words} words**. You MUST write a complete essay that reaches this length. Do NOT stop until you have written at least ${words} words. If you finish the main ideas early, continue by adding more details, examples, explanations, or relevant quotations to expand the essay. Under no circumstances should you output a short response.
+## WORD COUNT
+You MUST write at least ${words} words. Do NOT stop early.
 
 ## TASK
-Write a **complete, well-structured** essay in **pure Lisan-ud-Dawat** on the topic: "${topic}".
-The essay must follow the **${type}** style. Style description: ${typeDescription[type] || typeDescription.Other}.
-
+Write a **complete** essay on "${topic}" in **${type}** style.
 ${openingInstruction}
 
-## STRUCTURE (do NOT use headings)
-Your essay must have these three parts in order, flowing naturally:
-1. **Muqaddama** (introduction) – introduce the topic gracefully, set the context.
-2. **Bayan** (body) – develop the main ideas logically. ${ayahInstruction}
-3. **Natijah** (conclusion) – summarise and conclude with a thoughtful ending (often a prayer).
+## STRUCTURE (no headings)
+1. Muqaddama (introduction)
+2. Bayan (body) – ${ayahInstruction}
+3. Natijah (conclusion)
 
-## LANGUAGE REQUIREMENTS
-- The entire essay must be in **pure Lisan-ud-Dawat**. Use vocabulary and sentence structures typical of Dawoodi Bohra sermons.
-- Study the following short phrases for style inspiration, but **create entirely new sentences**:
-  ${styleExamples}
-- Do **not** mention any Sahabah, Khalifas, or contemporary figures by name – only Allah and the Prophet ﷺ may be referenced.
+## LANGUAGE
+- Pure Lisan-ud-Dawat: use words like "محبت" not "لَو".
+- Style inspiration: ${styleExamples} (create new sentences).
+- Do not mention Sahabah or Khalifas by name.
 
 ## OUTPUT
-Return **only the essay text** – no headings, no notes, no explanations. The essay should be a single block of text (paragraphs separated by blank lines) in Lisan-ud-Dawat script. Remember: it must be at least ${words} words long.
+Only the essay text.
 `;
 
     try {
-        const maxTokens = Math.min(parseInt(words) * 4 + 800, 8000);
+        const maxTokens = Math.min(parseInt(words) * 2 + 500, 3000);
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
@@ -113,7 +107,7 @@ Return **only the essay text** – no headings, no notes, no explanations. The e
                     parts: [{ text: systemPrompt }]
                 }],
                 generationConfig: {
-                    temperature: 0.85,  // slightly lower for more focused language
+                    temperature: 0.85,
                     maxOutputTokens: maxTokens,
                     topP: 0.95,
                     topK: 40
@@ -124,7 +118,7 @@ Return **only the essay text** – no headings, no notes, no explanations. The e
         const data = await response.json();
 
         if (!response.ok) {
-            console.error('Gemini API error:', data);
+            console.error('Gemini API error:', JSON.stringify(data, null, 2));
             return res.status(response.status).json({ error: data.error?.message || 'Gemini API error' });
         }
 
@@ -140,4 +134,4 @@ Return **only the essay text** – no headings, no notes, no explanations. The e
         console.error('API call failed:', error);
         res.status(500).json({ error: 'Server error', message: error.message });
     }
-}
+};
