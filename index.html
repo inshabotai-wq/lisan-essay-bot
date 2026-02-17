@@ -20,6 +20,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <!-- jsPDF for PDF export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- FileSaver for Word export -->
@@ -126,9 +129,9 @@
         }
 
         .main {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem 4rem;
+            padding: 2rem 3rem;
             position: relative;
             z-index: 10;
             min-height: 100vh;
@@ -256,9 +259,13 @@
         }
 
         .hero-desc {
-            font-size: 1.1rem;
-            color: #b7c0d8;
+            font-size: 1.3rem;
+            color: #fde68a;
             margin-bottom: 1.5rem;
+            text-shadow: 0 0 8px #fbbf24;
+            border-bottom: 2px solid #fbbf24;
+            display: inline-block;
+            padding-bottom: 0.3rem;
         }
 
         /* Disclaimer banner */
@@ -268,15 +275,16 @@
             border: 1px solid rgba(245, 158, 11, 0.3);
             border-radius: 60px;
             padding: 1rem 2rem;
-            margin: 0 0 2.5rem 0;
+            margin: 0 0 2rem 0;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #fde68a;
             box-shadow: 0 10px 25px -8px #b45309;
             width: 100%;
+            text-align: center;
         }
 
         .disclaimer-banner i {
@@ -284,8 +292,8 @@
             color: #fbbf24;
         }
 
-        /* Input row */
-        .input-row {
+        /* Main input row (topic only) */
+        .topic-row {
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -293,14 +301,14 @@
             flex-wrap: wrap;
         }
 
-        .input-label {
+        .topic-label {
             font-size: 1.3rem;
             font-weight: 500;
             color: #fde68a;
             white-space: nowrap;
         }
 
-        .input-wrapper {
+        .topic-wrapper {
             flex: 1;
             display: flex;
             background: rgba(20, 30, 50, 0.4);
@@ -320,12 +328,12 @@
             100% { box-shadow: 0 25px 45px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset; }
         }
 
-        .input-wrapper:focus-within {
+        .topic-wrapper:focus-within {
             box-shadow: 0 30px 55px -10px #fbbf24, 0 0 0 2px #fbbf24 inset;
             animation: none;
         }
 
-        .input-wrapper i {
+        .topic-wrapper i {
             color: #7f8fb2;
             font-size: 1.5rem;
         }
@@ -335,7 +343,7 @@
             background: transparent;
             border: none;
             outline: none;
-            font-family: 'Outfit', sans-serif;  /* clean font for input */
+            font-family: 'Outfit', sans-serif;
             font-size: 1.3rem;
             color: white;
             padding: 1rem 0;
@@ -346,7 +354,15 @@
             font-weight: 300;
         }
 
-        /* Essay type dropdown */
+        /* Controls row (type, word count, toggle, generate) */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
         .type-select {
             background: rgba(20, 30, 50, 0.6);
             border: 1px solid rgba(255,255,255,0.1);
@@ -375,18 +391,40 @@
             border-color: #fbbf24;
         }
 
-        /* Generate button */
+        .word-select {
+            min-width: 120px;
+        }
+
+        .ayah-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fde68a;
+            background: rgba(245,158,11,0.1);
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            border: 1px solid rgba(245,158,11,0.3);
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            white-space: nowrap;
+        }
+        .ayah-toggle input {
+            width: 18px;
+            height: 18px;
+            accent-color: #fbbf24;
+        }
+
         .generate-btn {
             background: linear-gradient(145deg, #fbbf24, #d97706);
             border: none;
             border-radius: 50px;
-            padding: 1.2rem 2.8rem;
-            font-size: 1.2rem;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #0b0f1a;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.6rem;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 15px 25px -8px #b45309, 0 0 0 1px rgba(255,255,255,0.2) inset;
@@ -394,7 +432,7 @@
         }
 
         .generate-btn i {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             transition: transform 0.3s;
         }
 
@@ -437,10 +475,11 @@
             background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(20px);
             border-radius: 40px;
-            padding: 3rem;
+            padding: 2rem;
             border: 1px solid rgba(255,255,255,0.08);
             box-shadow: 0 30px 50px -20px #00000080, 0 0 0 1px rgba(255,255,255,0.05) inset;
             transition: all 0.3s;
+            position: relative;
         }
 
         .essay-card:hover {
@@ -456,7 +495,7 @@
             white-space: pre-wrap;
             word-wrap: break-word;
             min-height: 300px;
-            max-height: 700px;
+            max-height: 600px;
             overflow-y: auto;
             direction: rtl;
             text-align: right;
@@ -485,28 +524,36 @@
             font-size: 1.3rem;
         }
 
-        /* Loading animation */
-        .loading-animation {
-            text-align: center;
-            padding: 80px 20px;
-        }
-        .loading-animation i {
-            font-size: 4rem;
-            color: #fbbf24;
-            margin-bottom: 20px;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        .loading-animation p {
-            color: #a6b0cc;
-            font-size: 1.3rem;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { opacity: 0.6; transform: scale(1); }
+        /* Floating help button inside result card */
+        .help-ai-float {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid #fbbf24;
+            border-radius: 40px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            color: #fde68a;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            z-index: 5;
         }
 
-        /* Word count */
+        .help-ai-float:hover {
+            background: rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 15px #fbbf24;
+        }
+
+        .help-ai-float i {
+            font-size: 1rem;
+        }
+
+        /* Word count display */
         .word-count {
             margin-top: 1rem;
             font-size: 1rem;
@@ -644,14 +691,9 @@
         }
 
         .modal-content p {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.8;
             color: #b0bad4;
-        }
-
-        .modal-content ul {
-            color: #b0bad4;
-            margin-left: 1.5rem;
         }
 
         .modal-close {
@@ -685,6 +727,22 @@
             background: #fcd34d;
         }
 
+        /* Gamification elements */
+        .word-counter {
+            background: #fbbf24;
+            color: #0b0f1a;
+            border-radius: 20px;
+            padding: 0.2rem 0.8rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .fun-message {
+            color: #fbbf24;
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+
         /* Responsive */
         @media (max-width: 1000px) {
             .main {
@@ -704,19 +762,15 @@
                 align-items: flex-start;
                 gap: 1rem;
             }
-            .input-row {
+            .topic-row, .controls-row {
                 flex-direction: column;
                 align-items: stretch;
             }
-            .input-label {
+            .topic-label {
                 text-align: center;
             }
-            .type-select {
+            .type-select, .word-select, .ayah-toggle, .generate-btn {
                 width: 100%;
-            }
-            .generate-btn {
-                width: 100%;
-                justify-content: center;
             }
             .hero h1 {
                 font-size: 2.8rem;
@@ -725,7 +779,7 @@
                 font-size: 3.2rem;
             }
             .essay-card {
-                padding: 2rem;
+                padding: 1.5rem;
             }
             .disclaimer-banner {
                 font-size: 1rem;
@@ -768,7 +822,7 @@
                     <div class="pill" onclick="showModal('disclaimer')">
                         <i class="fas fa-info-circle"></i> Disclaimer
                     </div>
-                    <div class="pill" onclick="showModal('underConstruction')">
+                    <div class="pill" onclick="showModal('about')">
                         <i class="fas fa-pen-fancy"></i> About
                     </div>
                 </div>
@@ -781,23 +835,27 @@
                     <span class="hero-sub">AI‑Powered Essays</span>
                 </h1>
                 <div class="hero-desc">
-                    Authentic Lisan‑ud‑Dawat, structured Muqaddama → Bayan → Natijah, with Quran & Hadith.
+                    Authentic Lisan‑ud‑Dawat · Muqaddama → Bayan → Natijah · Quran & Hadith
                 </div>
             </div>
 
-            <!-- Disclaimer Banner (still present) -->
+            <!-- Disclaimer Banner (updated text) -->
             <div class="disclaimer-banner">
                 <i class="fas fa-language"></i>
-                <span><strong>Type your topic in any script (Urdu, Arabic, English/Roman).</strong> The essay will always be generated in pure Lisan‑ud‑Dawat script.</span>
+                <span><strong>Type your topic in any script (Urdu, Arabic, English or Lisan-ud-Dawat).</strong> The essay will always be generated in pure Lisan‑ud‑Dawat script.</span>
             </div>
 
-            <!-- Input row with fixed text and dropdown -->
-            <div class="input-row">
-                <span class="input-label">Write a insha on</span>
-                <div class="input-wrapper">
+            <!-- Topic input row -->
+            <div class="topic-row">
+                <span class="topic-label">Write an insha on</span>
+                <div class="topic-wrapper">
                     <i class="fas fa-pen"></i>
                     <input type="text" id="topic" placeholder="e.g., ilm ki fazilat, والدین کی خدمت" dir="auto" autofocus>
                 </div>
+            </div>
+
+            <!-- Controls row -->
+            <div class="controls-row">
                 <select id="essayType" class="type-select">
                     <option value="Expository">Expository</option>
                     <option value="Descriptive">Descriptive</option>
@@ -805,6 +863,20 @@
                     <option value="Narrative">Narrative</option>
                     <option value="Other">Other</option>
                 </select>
+                <select id="wordCount" class="type-select word-select">
+                    <option value="100">100 words</option>
+                    <option value="200" selected>200 words</option>
+                    <option value="300">300 words</option>
+                    <option value="400">400 words</option>
+                    <option value="500">500 words</option>
+                    <option value="600">600 words</option>
+                    <option value="700">700 words</option>
+                    <option value="800">800 words</option>
+                </select>
+                <label class="ayah-toggle">
+                    <input type="checkbox" id="includeAyah" checked>
+                    <span>Include Ayah & Hadith</span>
+                </label>
                 <button class="generate-btn" id="generateBtn" onclick="generateEssay()">
                     <span>Generate</span>
                     <i class="fas fa-arrow-right"></i>
@@ -818,16 +890,19 @@
                     <h2>Your Essay</h2>
                 </div>
                 <div class="essay-card">
+                    <!-- Floating help button (gamified) -->
+                    <div class="help-ai-float" onclick="openWordModal()">
+                        <i class="fas fa-brain"></i> Help AI Learn
+                        <span class="word-counter" id="userContributionCount">0</span>
+                    </div>
                     <div id="result">
                         <div class="result-placeholder">
                             <i class="fas fa-pencil-alt" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.6;"></i>
                             <p>Enter a topic above and generate a masterpiece.</p>
                         </div>
                     </div>
-                    <!-- Word count display -->
-                    <div class="word-count" id="wordCount"></div>
+                    <div class="word-count" id="wordCountDisplay"></div>
                 </div>
-                <!-- Export buttons (hidden initially) -->
                 <div class="export-buttons" id="exportButtons" style="display: none;">
                     <button class="export-btn" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export as PDF</button>
                     <button class="export-btn" onclick="exportWord()"><i class="fas fa-file-word"></i> Export as Word</button>
@@ -854,7 +929,26 @@
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- Word Submission Modal (Gamified) -->
+    <div id="wordModalOverlay" class="modal-overlay" onclick="closeWordModal(event)">
+        <div class="modal-content" style="max-width: 450px;">
+            <button class="modal-close" onclick="closeWordModal(event)"><i class="fas fa-times"></i></button>
+            <h3>✨ Help the AI Learn ✨</h3>
+            <p>The AI needs your knowledge! Below is an English word it wants to learn in Lisan‑ud‑Dawat.</p>
+            <div style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+                <div style="font-size: 2rem; font-weight: bold; color: #fbbf24; margin-bottom: 0.5rem;" id="unknownWord">knowledge</div>
+                <p style="color: #b0bad4;">Type its Lisan‑ud‑Dawat equivalent:</p>
+                <input type="text" id="lisanTranslation" style="width:100%; padding:0.8rem; background: rgba(255,255,255,0.05); border:1px solid #3f4e77; border-radius:20px; color:white; font-family:'LisanFont','Noto Naskh Arabic'; direction:rtl; text-align:right;">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="funMessage" class="fun-message"></span>
+                <button class="modal-btn" onclick="submitTranslation()">Submit & Earn 🏆</button>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #8e9fc3;">You've helped with <span id="contributionCount">0</span> words so far!</p>
+        </div>
+    </div>
+
+    <!-- Generic Modals (About, Privacy, Disclaimer) -->
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content" id="modal-content">
             <button class="modal-close" onclick="closeModal(event)"><i class="fas fa-times"></i></button>
@@ -863,7 +957,31 @@
     </div>
 
     <script>
-        // Splash screen fade out after 2 seconds
+        // Firebase configuration (YOUR actual config)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBGFi26eysIW59qPY4HE2pLoWPYk33EJuE",
+            authDomain: "al-lisan-ai.firebaseapp.com",
+            projectId: "al-lisan-ai",
+            storageBucket: "al-lisan-ai.firebasestorage.app",
+            messagingSenderId: "340294975078",
+            appId: "1:340294975078:web:5f6b978228f7e5e95977a7"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Gamification: user's contribution count (stored locally)
+        let userContributions = localStorage.getItem('alLisanContributions') ? parseInt(localStorage.getItem('alLisanContributions')) : 0;
+        document.getElementById('userContributionCount').innerText = userContributions;
+        document.getElementById('contributionCount').innerText = userContributions;
+
+        // List of unknown words (for demo – in production this could come from a Firestore collection)
+        const unknownWords = [
+            "knowledge", "patience", "charity", "parents", "prayer", "fasting", "honesty", "mercy", "gratitude", "wisdom"
+        ];
+        let currentUnknownIndex = Math.floor(Math.random() * unknownWords.length);
+        document.getElementById('unknownWord').innerText = unknownWords[currentUnknownIndex];
+
+        // Splash screen
         window.addEventListener('load', function() {
             setTimeout(function() {
                 document.getElementById('splash').style.opacity = '0';
@@ -874,7 +992,7 @@
             }, 2000);
         });
 
-        // Modal functions
+        // Generic modal functions
         const modalOverlay = document.getElementById('modal-overlay');
         const modalBody = document.getElementById('modal-body');
 
@@ -887,18 +1005,13 @@
                           <ul>
                               <li>Accepts topics in any script (English, Urdu, Arabic, Roman)</li>
                               <li>Always outputs in authentic Lisan‑ud‑Dawat script</li>
-                              <li>Powered by advanced AI, guided by community sermons (style only, never copied)</li>
+                              <li>Powered by advanced AI, guided by community contributions</li>
                               <li>Free for the community, with no login required</li>
                           </ul>`;
             } else if (type === 'privacy') {
                 title = 'Your Privacy is Safe';
-                content = `<p>We do not collect, store, or share any personal information. The topics you enter are used only to generate your essay and are not saved. Your data remains yours.</p>
+                content = `<p>We do not collect, store, or share any personal information. The topics you enter are used only to generate your essay and are not saved. Word submissions are stored anonymously to help improve the AI.</p>
                           <p>We use Google AdSense for ads, which may use cookies, but we have no access to that data. For more details, please refer to Google's privacy policy.</p>`;
-            } else if (type === 'underConstruction') {
-                title = 'Al Lisan · Under Construction';
-                content = `<p>This project is in active development. We are continuously improving the AI to deliver even more authentic and refined essays in Lisan‑ud‑Dawat.</p>
-                          <p>Stay tuned – many exciting updates are on the way! Your feedback is always welcome.</p>
-                          <p><i class="fas fa-heart" style="color: #fbbf24;"></i> Thank you for being part of this journey.</p>`;
             } else if (type === 'disclaimer') {
                 title = 'Disclaimer';
                 content = `<p>This AI tool is under active development. While we strive for accuracy, responses may occasionally be imperfect or contain errors. The AI is trained on the <em>style</em> of authentic sermons but cannot replicate actual Sermon Bayan or Kalaam – those remain the preserve of our community's living tradition.</p>
@@ -914,22 +1027,85 @@
             }
         }
 
-        // Global variable for current essay
+        // Word submission modal
+        const wordModalOverlay = document.getElementById('wordModalOverlay');
+        const funMessage = document.getElementById('funMessage');
+
+        function openWordModal() {
+            // Pick a random unknown word
+            currentUnknownIndex = Math.floor(Math.random() * unknownWords.length);
+            document.getElementById('unknownWord').innerText = unknownWords[currentUnknownIndex];
+            document.getElementById('lisanTranslation').value = '';
+            funMessage.innerText = '';
+            wordModalOverlay.style.display = 'flex';
+        }
+
+        function closeWordModal(event) {
+            if (event.target === wordModalOverlay || event.target.closest('.modal-close')) {
+                wordModalOverlay.style.display = 'none';
+            }
+        }
+
+        function submitTranslation() {
+            const englishWord = document.getElementById('unknownWord').innerText;
+            const lisanTranslation = document.getElementById('lisanTranslation').value.trim();
+            if (!lisanTranslation) {
+                alert('Please enter the Lisan‑ud‑Dawat equivalent.');
+                return;
+            }
+
+            // Store in Firestore
+            db.collection('wordSubmissions').add({
+                english: englishWord,
+                lisan: lisanTranslation,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                // Update contribution count
+                userContributions++;
+                localStorage.setItem('alLisanContributions', userContributions);
+                document.getElementById('userContributionCount').innerText = userContributions;
+                document.getElementById('contributionCount').innerText = userContributions;
+
+                // Show fun message
+                const messages = [
+                    "شكراً! You're amazing! 🎉",
+                    "Great! The AI just got smarter! 🧠",
+                    "You earned a knowledge point! 🌟",
+                    "Another word mastered! 💪",
+                    "Thanks for being a language hero! 🦸"
+                ];
+                funMessage.innerText = messages[Math.floor(Math.random() * messages.length)];
+
+                // Clear input and pick a new word after a short delay
+                setTimeout(() => {
+                    openWordModal(); // show a new word
+                }, 1500);
+            })
+            .catch((error) => {
+                console.error('Error adding document: ', error);
+                alert('Sorry, there was an error. Please try again later.');
+            });
+        }
+
+        // Essay generation (same as before, but with fixed functions)
         let currentEssay = '';
 
-        // Word count function
         function countWords(str) {
             return str.trim().split(/\s+/).length;
         }
 
-        // Essay generation function
         async function generateEssay() {
             const topicInput = document.getElementById('topic');
             const topic = topicInput.value.trim();
             const typeSelect = document.getElementById('essayType');
             const essayType = typeSelect.value;
+            const wordCountSelect = document.getElementById('wordCount');
+            const wordCount = wordCountSelect.value;
+            const includeAyah = document.getElementById('includeAyah').checked;
+
             const resultDiv = document.getElementById('result');
-            const wordCountSpan = document.getElementById('wordCount');
+            const wordCountSpan = document.getElementById('wordCountDisplay');
             const generateBtn = document.getElementById('generateBtn');
             const btnText = generateBtn.querySelector('span');
             const btnIcon = generateBtn.querySelector('.fa-arrow-right');
@@ -940,7 +1116,7 @@
                 return;
             }
 
-            // Loading state – beautiful animation
+            // Loading state
             const originalBtnText = btnText.innerText;
             btnText.innerText = 'Generating';
             btnIcon.style.display = 'none';
@@ -950,7 +1126,6 @@
             generateBtn.appendChild(spinner);
             generateBtn.disabled = true;
 
-            // Add keyframes for spinner if not present
             if (!document.getElementById('spinner-keyframes')) {
                 const style = document.createElement('style');
                 style.id = 'spinner-keyframes';
@@ -958,34 +1133,37 @@
                 document.head.appendChild(style);
             }
 
-            // Show loading in result with new animation
             resultDiv.innerHTML = `
-                <div class="loading-animation">
-                    <i class="fas fa-feather-alt"></i>
-                    <p>Crafting your essay in Lisan‑ud‑Dawat...</p>
+                <div style="text-align: center; padding: 80px 20px;">
+                    <i class="fas fa-feather-alt fa-spin" style="font-size: 4rem; color: #fbbf24; margin-bottom: 20px;"></i>
+                    <p style="color: #a6b0cc; font-size: 1.3rem;">Crafting your essay in Lisan‑ud‑Dawat...</p>
                 </div>
             `;
-            wordCountSpan.innerHTML = '';
+            if (wordCountSpan) wordCountSpan.innerHTML = '';
             exportButtons.style.display = 'none';
 
             try {
                 const response = await fetch('/api/gemini', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ topic, type: essayType })
+                    body: JSON.stringify({
+                        topic,
+                        type: essayType,
+                        words: wordCount,
+                        includeAyah: includeAyah
+                    })
                 });
 
                 const data = await response.json();
 
                 if (data.essay) {
-                    // Append the two required lines
                     const footerLine1 = "اطال الله عمر سيدنا مُـفـضّـل سـيـفُ ٱلـدّين الى يوم الدين. امين";
                     const footerLine2 = "you will have to add Sermon bayan and Kalaam , check disclaimer for more info.";
                     let fullEssay = data.essay + "\n\n" + footerLine1 + "\n" + footerLine2;
                     currentEssay = fullEssay;
                     resultDiv.innerHTML = `<div style="direction: rtl; text-align: right;">${fullEssay.replace(/\n/g, '<br>')}</div>`;
-                    const wordCount = countWords(fullEssay);
-                    wordCountSpan.innerHTML = `📝 Word count: ${wordCount} (max 1000)`;
+                    const actualWords = countWords(fullEssay);
+                    wordCountSpan.innerHTML = `📝 Word count: ${actualWords} (requested: ${wordCount})`;
                     exportButtons.style.display = 'flex';
                 } else {
                     currentEssay = '';
@@ -1012,21 +1190,27 @@
             }
         }
 
-        // Export as PDF
+        // Export functions
         function exportPDF() {
             if (!currentEssay) return;
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            const note = "If the text does not display correctly, please install the Al-Kanz font. You can download it from Google Fonts.";
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(note, 15, 10);
             const splitText = doc.splitTextToSize(currentEssay, 180);
-            // Note: jsPDF may not support custom fonts; fallback to standard.
+            doc.setFontSize(12);
+            doc.setTextColor(0);
             doc.text(splitText, 15, 20);
             doc.save('Al_Lisan_Essay.pdf');
         }
 
-        // Export as Word
         function exportWord() {
             if (!currentEssay) return;
-            const blob = new Blob([currentEssay], { type: 'application/msword' });
+            const note = "If the text does not display correctly, please install the Al-Kanz font. You can download it from Google Fonts.\n\n";
+            const fullContent = note + currentEssay;
+            const blob = new Blob([fullContent], { type: 'application/msword' });
             saveAs(blob, 'Al_Lisan_Essay.doc');
         }
     </script>
